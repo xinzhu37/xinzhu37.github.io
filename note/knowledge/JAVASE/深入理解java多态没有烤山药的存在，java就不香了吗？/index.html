@@ -1,0 +1,752 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#0078E7"><meta name="author" content="xinzhu"><meta name="copyright" content="xinzhu"><meta name="generator" content="Hexo 5.4.0"><meta name="theme" content="hexo-theme-yun"><title>深入理解java多态没有烤山药的存在，java就不香了吗？ | 心竹的小镇</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@900&amp;display=swap" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/star-markdown-css@0.1.25/dist/yun/yun-markdown.min.css"><script src="//at.alicdn.com/t/font_1140697_dxory92pb0h.js" async></script><script src="https://cdn.jsdelivr.net/npm/scrollreveal/dist/scrollreveal.min.js" defer></script><script>document.addEventListener("DOMContentLoaded", () => {
+  [".post-card",".post-content img"].forEach((target)=> {
+    ScrollReveal().reveal(target);
+  })
+});
+</script><link id="light-prism-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@latest/themes/prism.css" media="(prefers-color-scheme: light)"><link id="dark-prism-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@latest/themes/prism-tomorrow.css" media="(prefers-color-scheme: dark)"><link rel="icon" href="/yun.svg"><link rel="mask-icon" href="/yun.svg" color="#0078E7"><link rel="alternate icon" href="/yun.ico"><link rel="preload" href="/css/hexo-theme-yun.css" as="style"><link rel="preload" href="/js/utils.js" as="script"><link rel="preload" href="/js/hexo-theme-yun.js" as="script"><link rel="prefetch" href="/js/sidebar.js" as="script"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><script id="yun-config">
+    const Yun = window.Yun || {};
+    window.CONFIG = {"hostname":"xinzhu37.github.io","root":"/","title":"心竹君的小站","version":"1.6.1","mode":"auto","copycode":true,"page":{"isPost":true},"i18n":{"placeholder":"搜索...","empty":"找不到您查询的内容: ${query}","hits":"找到 ${hits} 条结果","hits_time":"找到 ${hits} 条结果（用时 ${time} 毫秒）"},"anonymous_image":"https://cdn.jsdelivr.net/gh/YunYouJun/cdn/img/avatar/none.jpg","say":{"api":"https://el-bot-api.vercel.app/api/words/young"},"fireworks":{"colors":["102, 167, 221","62, 131, 225","33, 78, 194"]}};
+  </script><link rel="stylesheet" href="/css/hexo-theme-yun.css"><script src="/js/utils.js"></script><script src="/js/hexo-theme-yun.js"></script><link rel="alternate" href="/atom.xml" title="心竹的小镇" type="application/atom+xml"><link rel="preconnect" href="https://www.google-analytics.com" crossorigin><script async src="https://www.googletagmanager.com/gtag/js?id=G-1LL0D86CY9"></script><script>if (CONFIG.hostname === location.hostname) {
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-1LL0D86CY9');
+}</script><script data-ad-client="ca-pub-2245427233262012" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><script>(function(){
+  var bp = document.createElement('script');
+  var curProtocol = window.location.protocol.split(':')[0];
+  if (curProtocol === 'https') {
+    bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+  }
+  else {
+    bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+  }
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(bp, s);
+})();</script><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-M9KWR9L');</script><!-- End Google Tag Manager --><meta name="description" content="我不想知道各位理解java多态没有烤山药的存在，java香不香的问题了，我不要你们认为，我只要我觉得 (感觉要被打…) 在我认为多态绝对是面向对象的第三大特性中让很多小白同学以及初学者难以跨越的鸿沟，因为多态有很多细节性的知识，不花点时间，还真不好理解多态。这么说吧，如果你觉得你已经完全理解了多态，你不妨做做下面的程序，如果你能全都答对，那没问题了，多态对你来说真的不是问题！如果在第四个就趴下了，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入理解java多态没有烤山药的存在，java就不香了吗？">
+<meta property="og:url" content="https://xinzhu37.github.io/note/knowledge/JAVASE/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3java%E5%A4%9A%E6%80%81%E6%B2%A1%E6%9C%89%E7%83%A4%E5%B1%B1%E8%8D%AF%E7%9A%84%E5%AD%98%E5%9C%A8%EF%BC%8Cjava%E5%B0%B1%E4%B8%8D%E9%A6%99%E4%BA%86%E5%90%97%EF%BC%9F/index.html">
+<meta property="og:site_name" content="心竹的小镇">
+<meta property="og:description" content="我不想知道各位理解java多态没有烤山药的存在，java香不香的问题了，我不要你们认为，我只要我觉得 (感觉要被打…) 在我认为多态绝对是面向对象的第三大特性中让很多小白同学以及初学者难以跨越的鸿沟，因为多态有很多细节性的知识，不花点时间，还真不好理解多态。这么说吧，如果你觉得你已经完全理解了多态，你不妨做做下面的程序，如果你能全都答对，那没问题了，多态对你来说真的不是问题！如果在第四个就趴下了，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/notes/se/three_characteristics/extends/7.png">
+<meta property="article:published_time" content="2022-05-04T15:52:00.000Z">
+<meta property="article:modified_time" content="2022-05-04T15:52:00.000Z">
+<meta property="article:author" content="xinzhu">
+<meta property="article:tag" content="笔记">
+<meta property="article:tag" content="多态">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/notes/se/three_characteristics/extends/7.png"><script src="/js/ui/mode.js"></script></head><body><script defer src="https://cdn.jsdelivr.net/npm/animejs@latest"></script><script defer src="/js/ui/fireworks.js"></script><canvas class="fireworks"></canvas><div class="container"><a class="sidebar-toggle hty-icon-button" id="menu-btn"><div class="hamburger hamburger--spin" type="button"><span class="hamburger-box"><span class="hamburger-inner"></span></span></div></a><div class="sidebar-toggle sidebar-overlay"></div><aside class="sidebar"><script src="/js/sidebar.js"></script><ul class="sidebar-nav"><li class="sidebar-nav-item sidebar-nav-toc hty-icon-button sidebar-nav-active" data-target="post-toc-wrap" title="文章目录"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-list-ordered"></use></svg></li><li class="sidebar-nav-item sidebar-nav-overview hty-icon-button" data-target="site-overview-wrap" title="站点概览"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-passport-line"></use></svg></li></ul><div class="sidebar-panel" id="site-overview-wrap"><div class="site-info fix-top"><a class="site-author-avatar" href="/about/" title="xinzhu"><img width="96" loading="lazy" src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/medias/avatar.png" alt="xinzhu"><span class="site-author-status" title="Looking for dawn.">🌑</span></a><div class="site-author-name"><a href="/about/">xinzhu</a></div><a class="site-name" href="/about/site.html">心竹的小镇</a><sub class="site-subtitle">Nostalgia for a foreign country trip</sub><div class="site-desciption">希望能成为一个有趣的人</div></div><nav class="site-state"><a class="site-state-item hty-icon-button icon-home" href="/" title="首页"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-home-4-line"></use></svg></span></a><div class="site-state-item"><a href="/archives/" title="归档"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-archive-line"></use></svg></span><span class="site-state-item-count">36</span></a></div><div class="site-state-item"><a href="/categories/" title="分类"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-folder-2-line"></use></svg></span><span class="site-state-item-count">10</span></a></div><div class="site-state-item"><a href="/tags/" title="标签"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-price-tag-3-line"></use></svg></span><span class="site-state-item-count">41</span></a></div><a class="site-state-item hty-icon-button" href="/about/#comment" title="留言板"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-clipboard-line"></use></svg></span></a></nav><hr style="margin-bottom:0.5rem"><div class="links-of-author"><a class="links-of-author-item hty-icon-button" rel="noopener" href="/atom.xml" title="RSS" target="_blank" style="color:orange"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-rss-line"></use></svg></a><a class="links-of-author-item hty-icon-button" rel="noopener" href="tencent://AddContact/?fromId=50&amp;fromSubId=1&amp;subcmd=all&amp;uin=1148573442" title="QQ 1148573442" target="_blank" style="color:#12B7F5"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-qq-line"></use></svg></a><a class="links-of-author-item hty-icon-button" rel="noopener" href="https://github.com/xinzhu37" title="GitHub" target="_blank" style="color:#6e5494"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-github-line"></use></svg></a><a class="links-of-author-item hty-icon-button" rel="noopener" href="https://music.163.com/#/my/m/music/playlist?id=2038166981" title="网易云音乐" target="_blank" style="color:#C20C0C"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-netease-cloud-music-line"></use></svg></a><a class="links-of-author-item hty-icon-button" rel="noopener" href="mailto:gfz0307@163.com" title="E-Mail" target="_blank" style="color:#8E71C1"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-mail-line"></use></svg></a></div><hr style="margin:0.5rem 1rem"><div class="links"><a class="links-item hty-icon-button" href="/links/" title="我的小伙伴们" style="color:dodgerblue"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-genderless-line"></use></svg></a></div><br><a class="links-item hty-icon-button" id="toggle-mode-btn" href="javascript:;" title="Mode" style="color: #f1cb64"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-contrast-2-line"></use></svg></a></div><div class="sidebar-panel sidebar-panel-active" id="post-toc-wrap"><div class="post-toc"><div class="post-toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1%E3%80%81-%E4%BB%8E%E5%90%83%E7%83%A4%E5%B1%B1%E8%8D%AF%E9%87%8D%E6%96%B0%E8%AE%A4%E8%AF%86%E5%A4%9A%E6%80%81"><span class="toc-number">1.</span> <span class="toc-text">1、 从吃烤山药重新认识多态</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2%E3%80%81-%E5%A4%9A%E6%80%81%E5%89%8D%E6%8F%90%E6%9D%A1%E4%BB%B6%E3%80%90%E9%87%8D%E7%82%B9%E3%80%91"><span class="toc-number">2.</span> <span class="toc-text">2、 多态前提条件【重点】</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3%E3%80%81-%E5%A4%9A%E6%80%81%E7%9A%84%E4%BD%93%E7%8E%B0"><span class="toc-number">3.</span> <span class="toc-text">3、 多态的体现</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4%E3%80%81-%E5%A4%9A%E6%80%81%E4%B8%AD%E5%8A%A8%E6%80%81%E7%BB%91%E5%AE%9A%E4%B8%8E%E9%9D%99%E6%80%81%E7%BB%91%E5%AE%9A"><span class="toc-number">4.</span> <span class="toc-text">4、 多态中动态绑定与静态绑定</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4%E3%80%811-%E9%9D%99%E6%80%81%E7%BB%91%E5%AE%9A%EF%BC%88%E5%89%8D%E6%9C%9F%E7%BB%91%E5%AE%9A%EF%BC%89"><span class="toc-number">4.0.0.1.</span> <span class="toc-text">4、1.静态绑定（前期绑定）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4%E3%80%812-%E5%8A%A8%E6%80%81%E7%BB%91%E5%AE%9A%EF%BC%88%E5%90%8E%E6%9C%9F%E7%BB%91%E5%AE%9A%EF%BC%89"><span class="toc-number">4.0.0.2.</span> <span class="toc-text">4、2.动态绑定（后期绑定）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4%E3%80%813-%E9%9D%99%E6%80%81%E3%80%81%E5%8A%A8%E6%80%81%E7%BB%91%E5%AE%9A%E6%9C%AC%E8%B4%A8%E5%8C%BA%E5%88%AB"><span class="toc-number">4.0.0.3.</span> <span class="toc-text">4、3.静态、动态绑定本质区别</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4%E3%80%814-%E9%9D%99%E6%80%81%E3%80%81%E5%8A%A8%E6%80%81%E7%BB%91%E5%AE%9A%E5%9C%A8%E7%A8%8B%E5%BA%8F%E4%B8%AD%E8%BF%90%E8%A1%8C%E5%8C%BA%E5%88%AB"><span class="toc-number">4.0.0.4.</span> <span class="toc-text">4、4.静态、动态绑定在程序中运行区别</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5%E3%80%81-%E5%A4%9A%E6%80%81%E7%89%B9%E6%80%A7%E7%9A%84%E8%99%9A%E6%96%B9%E6%B3%95%EF%BC%88virtual%EF%BC%89"><span class="toc-number">5.</span> <span class="toc-text">5、 多态特性的虚方法（virtual）</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6%E3%80%81-%E9%87%8D%E8%BD%BD%E5%B1%9E%E4%BA%8E%E5%A4%9A%E6%80%81%E5%90%97%EF%BC%9F"><span class="toc-number">6.</span> <span class="toc-text">6、 重载属于多态吗？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7%E3%80%81-%E5%90%91%E4%B8%8A%E8%BD%AC%E5%9E%8B"><span class="toc-number">7.</span> <span class="toc-text">7、 向上转型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#8%E3%80%811-instanceof%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-number">7.0.0.1.</span> <span class="toc-text">8、1. instanceof的使用</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#9%E3%80%81-%E5%90%91%E4%B8%8A%E5%90%91%E4%B8%8B%E8%BD%AC%E5%9E%8B%E5%86%8D%E6%AC%A1%E5%88%86%E6%9E%90%E3%80%90%E5%8A%A0%E9%A4%90%E4%B8%8D%E5%8A%A0%E4%BB%B7%E3%80%91"><span class="toc-number">8.</span> <span class="toc-text">9、 向上向下转型再次分析【加餐不加价】</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#10%E3%80%81-%E5%A4%9A%E6%80%81%E4%B8%8E%E6%9E%84%E9%80%A0%E5%99%A8%E4%B9%8B%E9%97%B4%E7%9A%84%E5%BE%AE%E5%A6%99"><span class="toc-number">9.</span> <span class="toc-text">10、 多态与构造器之间的微妙</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#11%E3%80%81-%E5%A4%9A%E6%80%81%E7%9A%84%E4%BC%98%E7%82%B9"><span class="toc-number">10.</span> <span class="toc-text">11、 多态的优点</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#12%E3%80%81-%E5%88%86%E6%9E%90%E5%BC%80%E7%AF%87%E7%9A%84%E4%B9%9D%E4%B8%AA%E9%97%AE%E9%A2%98"><span class="toc-number">11.</span> <span class="toc-text">12、 分析开篇的九个问题</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#13%E3%80%81-%E6%9C%80%E5%90%8E%E6%88%91%E4%BB%AC%E4%B8%80%E8%B5%B7%E6%9D%A5%E6%AD%A3%E5%BC%8F%E5%88%86%E6%9E%90%E9%82%A3%E4%B9%9D%E4%B8%AA%E9%A2%98"><span class="toc-number">12.</span> <span class="toc-text">13、 最后我们一起来正式分析那九个题</span></a></li></ol></div></div></div></aside><main class="sidebar-translate" id="content"><div id="post"><article class="hty-card post-block" itemscope itemtype="https://schema.org/Article"><link itemprop="mainEntityOfPage" href="https://xinzhu37.github.io/note/knowledge/JAVASE/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3java%E5%A4%9A%E6%80%81%E6%B2%A1%E6%9C%89%E7%83%A4%E5%B1%B1%E8%8D%AF%E7%9A%84%E5%AD%98%E5%9C%A8%EF%BC%8Cjava%E5%B0%B1%E4%B8%8D%E9%A6%99%E4%BA%86%E5%90%97%EF%BC%9F/"><span hidden itemprop="author" itemscope itemtype="https://schema.org/Person"><meta itemprop="name" content="xinzhu"><meta itemprop="description"></span><span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization"><meta itemprop="name" content="心竹的小镇"></span><header class="post-header"><h1 class="post-title" itemprop="name headline">深入理解java多态没有烤山药的存在，java就不香了吗？<a class="post-edit-link" href="null_posts/note/knowledge/JAVASE/深入理解java多态没有烤山药的存在，java就不香了吗？.md" target="_blank" title="编辑" rel="noopener"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-edit-line"></use></svg></a></h1><div class="post-meta"><div class="post-time" style="display:inline-block"><span class="post-meta-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-calendar-line"></use></svg></span> <time title="创建时间：2022-05-04 23:52:00" itemprop="dateCreated datePublished" datetime="2022-05-04T23:52:00+08:00">2022-05-04</time></div><div class="post-classify"><span class="post-category"> <span class="post-meta-item-icon" style="margin-right:3px;"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-folder-line"></use></svg></span><span itemprop="about" itemscope itemtype="https://schema.org/Thing"><a class="category-item" href="/categories/%E7%9F%A5%E8%AF%86%E7%82%B9/" style="--text-color:var(--hty-text-color)" itemprop="url" rel="index"><span itemprop="text">知识点</span></a></span></span><span class="post-tag"><span class="post-meta-divider">-</span><a class="tag-item" href="/tags/%E7%AC%94%E8%AE%B0/" style="--text-color:dimgray"><span class="post-meta-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-price-tag-3-line"></use></svg></span><span class="tag-name">笔记</span></a><a class="tag-item" href="/tags/%E5%A4%9A%E6%80%81/" style="--text-color:var(--hty-text-color)"><span class="post-meta-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-price-tag-3-line"></use></svg></span><span class="tag-name">多态</span></a></span></div></div></header><section class="post-body" itemprop="articleBody"><div class="post-content markdown-body" style="--smc-primary:#0078E7;"><p>我不想知道各位理解java多态没有烤山药的存在，java香不香的问题了，我不要你们认为，我只要我觉得 (感觉要被打…)</p>
+<p>在我认为多态绝对是面向对象的第三大特性中让很多小白同学以及初学者难以跨越的鸿沟，因为多态有很多细节性的知识，不花点时间，还真不好理解多态。这么说吧，如果你觉得你已经完全理解了多态，你不妨做做下面的程序，如果你能全都答对，那没问题了，多态对你来说真的不是问题！如果在第四个就趴下了，那可以看看这篇文章，或许对你有所帮助，可能会让你重新见识到多态的魅力。</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token class-name">Polymorphic</span><span class="token punctuation">;</span>
+<span class="token comment">//爷爷类</span>
+<span class="token keyword">class</span> <span class="token class-name">Ye</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">show</span><span class="token punctuation">(</span><span class="token class-name">Sun</span> obj<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token string">"Ye and Sun"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">show</span><span class="token punctuation">(</span><span class="token class-name">Ye</span> obj<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token string">"Ye and Ye"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+<span class="token punctuation">&#125;</span>
+<span class="token comment">//爸爸类</span>
+<span class="token keyword">class</span> <span class="token class-name">Fu</span> <span class="token keyword">extends</span> <span class="token class-name">Ye</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">show</span><span class="token punctuation">(</span><span class="token class-name">Fu</span> obj<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token string">"Fu and Fu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">show</span><span class="token punctuation">(</span><span class="token class-name">Ye</span> obj<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token string">"Fu and Ye"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token comment">//儿子类</span>
+<span class="token keyword">class</span> <span class="token class-name">Zi</span> <span class="token keyword">extends</span> <span class="token class-name">Fu</span> <span class="token punctuation">&#123;</span>
+
+<span class="token punctuation">&#125;</span>
+<span class="token comment">//孙子类</span>
+<span class="token keyword">class</span> <span class="token class-name">Sun</span> <span class="token keyword">extends</span> <span class="token class-name">Fu</span> <span class="token punctuation">&#123;</span>
+
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">PolymorphicTest</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+         <span class="token class-name">Ye</span> y <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Ye</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Ye</span> y2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Fu</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">//向上</span>
+        <span class="token class-name">Fu</span> f <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Fu</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Zi</span> z <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Zi</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Sun</span> s <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Sun</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第一题 "</span> <span class="token operator">+</span> y<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>f<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第二题 "</span> <span class="token operator">+</span> y<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>z<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第三题 "</span> <span class="token operator">+</span> y<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第四题 "</span> <span class="token operator">+</span> y2<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>f<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//到这里挂了？？？</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第五题 "</span> <span class="token operator">+</span> y2<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>z<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第六题 "</span> <span class="token operator">+</span> y2<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第七题 "</span> <span class="token operator">+</span> f<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>f<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第八题 "</span> <span class="token operator">+</span> f<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>z<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第九题 "</span> <span class="token operator">+</span> f<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+     
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+
+<p>先把答案记在小本本上吧，再对照下面结果看看</p>
+<pre class="language-java" data-language="java"><code class="language-java">第一题 <span class="token class-name">Ye</span> and <span class="token class-name">Ye</span>
+第二题 <span class="token class-name">Ye</span> and <span class="token class-name">Ye</span>
+第三题 <span class="token class-name">Ye</span> and <span class="token class-name">Sun</span>
+第四题 <span class="token class-name">Fu</span> and <span class="token class-name">Ye</span>
+第五题 <span class="token class-name">Fu</span> and <span class="token class-name">Ye</span>
+第六题 <span class="token class-name">Ye</span> and <span class="token class-name">Sun</span>
+第七题 <span class="token class-name">Fu</span> and <span class="token class-name">Fu</span>
+第八题 <span class="token class-name">Fu</span> and <span class="token class-name">Fu</span>
+第九题 <span class="token class-name">Ye</span> and <span class="token class-name">Sun</span></code></pre>
+
+<p>如果你对上面的结果很意外，或者不解，那么恭喜你，你又能学到新知识了，成功的向架构师前进了一步！好了，让我们一起重新见识见识多态的魅力吧！</p>
+<h1 id="1、-从吃烤山药重新认识多态"><a href="#1、-从吃烤山药重新认识多态" class="headerlink" title="1、 从吃烤山药重新认识多态"></a>1、 从吃烤山药重新认识多态</h1><p>最近不是正火着吃烤山药么，学习就要走有趣化路线，毕竟兴趣永远最好的老师，咋们放开点，怎么有趣怎么来。</p>
+<p>小明妈妈的情绪非常不稳定，心情好的时候巴不得给小明花一个亿，，心情不好的时候巴不得把小明打成麻瓜，可是小明永远不知道妈妈的情绪变化。这不，今天一位老大爷在卖烤山药，边烤还边跳激光雨，嗨得不行，小明特别喜欢激光雨，马上就忍不住了，心里默默想着，刚烤的山药它不香嘛，激光雨烤的山药它不香嘛。于是忍不住对妈妈说：“妈妈，我想吃烤山药”，这个时候，来了,来了,他来了，它真的来了…你激动个锤子啊…是代码来了：</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token class-name">Polymorphic</span><span class="token punctuation">;</span>
+
+
+     <span class="token keyword">class</span>  <span class="token class-name">Matcher</span><span class="token punctuation">&#123;</span>
+        <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">matcherSpeak</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+            <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"想吃烤山药？"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+
+     <span class="token keyword">class</span> <span class="token class-name">HappyMother</span> <span class="token keyword">extends</span> <span class="token class-name">Matcher</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">matcherSpeak</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+            <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"开心的妈妈说：吃，吃大块的，一火车够吗"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+
+     <span class="token keyword">class</span> <span class="token class-name">SadMother</span> <span class="token keyword">extends</span> <span class="token class-name">Matcher</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">matcherSpeak</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+            <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"不开心的妈妈说：吃你个憨皮，看我回家扎不扎你就完事了"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+
+     <span class="token keyword">class</span> <span class="token class-name">VeryHappyMother</span> <span class="token keyword">extends</span> <span class="token class-name">Matcher</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">matcherSpeak</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+            <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"异常开心的妈妈说：买买买，烤山药咱全买了，顺便把大爷也买回家，天天给你表演激光雨（大爷懵逼中）"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UnderstandPolymorphic</span><span class="token punctuation">&#123;</span>
+        <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token class-name">Matcher</span> m <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HappyMother</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            m<span class="token punctuation">.</span><span class="token function">matcherSpeak</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            m <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SadMother</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            m<span class="token punctuation">.</span><span class="token function">matcherSpeak</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            m <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">VeryHappyMother</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            m<span class="token punctuation">.</span><span class="token function">matcherSpeak</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+运行结果：
+
+开心的妈妈说：吃，吃大块的，一火车够吗
+不开心的妈妈说：吃你个憨皮，看我回家扎不扎你就完事了
+异常开心的妈妈说：买买买，烤山药咱全买了，顺便把大爷也买回家，天天给你表演激光雨（大爷懵逼中）</code></pre>
+
+<p>妈妈听到小明想吃烤山药这同一行为，表现出不同的表现形式，这就是多态。多态专业定义则是：<font color=blue>程序中定义的引用变量所指向的具体类型和通过该引用变量发出的方法调用在编程时并不确定，而是在程序运行期间才确定</font>，这种情况叫做多态,没错是没错就是脑壳有点大，所以我选择简单点定义多态： 多态指同一行为，具有多个不同表现形式。为何会有如此微妙的变化呢，那我们就必须了解进行多态的前提了。</p>
+<h1 id="2、-多态前提条件【重点】"><a href="#2、-多态前提条件【重点】" class="headerlink" title="2、 多态前提条件【重点】"></a>2、 多态前提条件【重点】</h1><p>如果多态不能满足以下三个前提条件，那还玩犊子的多态【构不成多态，缺一不可】</p>
+<blockquote>
+<p>1、继承或者实现【二选一】<br>2、方法的重写【意义体现：不重写，无意义】<br>      子类对父类中某些方法进行重新定义，在调用这些方法时就会调用子类的方法。<br>3、父类引用指向子类对象（也可以说向上转型）【体现在格式上】</p>
+</blockquote>
+<p>回过头来看烤山药例子，确实都有继承，同样都重写了<font color=red>motherSpeak（）</font>方法，最关键的代码则是</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token class-name">Matcher</span> m <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HappyMother</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+
+<p>也就是所谓的 父类引用指向子类对象，这其实就是向上转型！对向上转型概念不清晰没事，下面会详细讲解。</p>
+<h1 id="3、-多态的体现"><a href="#3、-多态的体现" class="headerlink" title="3、 多态的体现"></a>3、 多态的体现</h1><blockquote>
+<p>多态体现的格式： <strong>父类/父接口类型  变量名  =  new  子类对象</strong>   <strong>变量名.方法名()</strong>;</p>
+</blockquote>
+<p> <font color=red><strong>当使用多态方式调用方法时，首先检查父类中是否有该方法，如果没有，则编译错误 ,如果有，执行的是子类重写后的方法</strong></font>，也就是向上转型时，<font color=red> <strong>子类单独定义的方法丢失问题</strong></font>。编译报错。 代码如下：</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token class-name">Demo</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span>  <span class="token class-name">Matcher</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">matcherSpeak</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span><span class="token comment">//=========================父类matcherSpeak()方法</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"吃烤山药？"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">HappyMother</span> <span class="token keyword">extends</span> <span class="token class-name">Matcher</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">matcherSpeak</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span><span class="token comment">//=========================子类matcherSpeak()方法</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"开心的妈妈说：吃，吃大块的，一蛇皮袋够吗"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">fatherSpeak</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span><span class="token comment">//=========================子类独有的fatherSpeak()方法</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"开心的妈妈说：吃，吃大块的，一麻袋够吗"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Test</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token class-name">Matcher</span> m<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">HappyMother</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        m<span class="token punctuation">.</span><span class="token function">matcherSpeak</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        m<span class="token punctuation">.</span><span class="token function">fatherSpeak</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//编译失败，无法解析fatherSpeak方法</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+
+<p>当然这个例子只是入门级的，接下来看个有点水平的例子</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token class-name">Demo</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span>  <span class="token class-name">Matcher</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">matcherSpeak</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"想吃烤山药？"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">HappyMother</span> <span class="token keyword">extends</span> <span class="token class-name">Matcher</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">matcherSpeak</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"开心的妈妈说：吃，吃大块的，一火车够吗"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">class</span> <span class="token class-name">SadMother</span> <span class="token keyword">extends</span> <span class="token class-name">HappyMother</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">tt</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"ttttttt"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Test</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token class-name">Matcher</span> mm<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">SadMother</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        mm<span class="token punctuation">.</span><span class="token function">matcherSpeak</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+运行结果：开心的妈妈说：吃，吃大块的，一火车够吗</code></pre>
+
+<p>有了第一个基础这个相信不难理解，接着看</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token class-name">Demo</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span>  <span class="token class-name">Matcher</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">matcherSpeak</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"想吃烤山药？"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">HappyMother</span> <span class="token keyword">extends</span> <span class="token class-name">Matcher</span> <span class="token punctuation">&#123;</span>
+    
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">class</span> <span class="token class-name">SadMother</span> <span class="token keyword">extends</span> <span class="token class-name">HappyMother</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">tt</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"ttttttt"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Test</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token class-name">Matcher</span> mm<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">SadMother</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        mm<span class="token punctuation">.</span><span class="token function">matcherSpeak</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+运行结果：想吃烤山药？</code></pre>
+
+<p>到这里，再来回味下这句话：</p>
+<blockquote>
+<p><font color=red><strong>当使用多态方式调用方法时，首先检查父类中是否有该方法，如果没有，则编译错误 ,如果有，执行的是子类重写后的方法</strong></font></p>
+</blockquote>
+<p>你可能会说子类中都没有这些个方法啊，何来执行子类重写后的方法一说？它好像是去父类中找该方法了。事实上，子类中是有这些方法的，这个方法继承自父类，只不过没有覆盖该方法，所以没有在子类中明确写出来而已，看起来像是调用了父类中的方法，实际上调用的还是子类中的。同学继承方面的知识该补补了，可以参考下面这篇【java基础】java继承从“我爸是李刚”讲起。</p>
+<h1 id="4、-多态中动态绑定与静态绑定"><a href="#4、-多态中动态绑定与静态绑定" class="headerlink" title="4、 多态中动态绑定与静态绑定"></a>4、 多态中动态绑定与静态绑定</h1><p>讲之前先来谈谈“<strong>绑定</strong>”的概念：<br>       绑定指的是一个方法的调用与方法所在的类(方法主体)关联起来，大致可以理解为一个方法调用另一个方法。对java来说，绑定分为静态绑定和动态绑定；或者分别叫做前期绑定和后期绑定。</p>
+<h4 id="4、1-静态绑定（前期绑定）"><a href="#4、1-静态绑定（前期绑定）" class="headerlink" title="4、1.静态绑定（前期绑定）"></a>4、1.静态绑定（前期绑定）</h4><p>在程序执行前方法已经被绑定，<font color=red>针对java静态绑定简单的可以理解为程序编译期的绑定</font>；java当中的方法只有<font color=red><code>final</code></font>，<font color=red><code>static</code></font>，<font color=red><code>private(不会被继承)</code></font> 和<font color=red><code>构造方法</code></font>是前期绑定【当然可能不止】</p>
+<h4 id="4、2-动态绑定（后期绑定）"><a href="#4、2-动态绑定（后期绑定）" class="headerlink" title="4、2.动态绑定（后期绑定）"></a>4、2.<font color=red>动态绑定</font>（后期绑定）</h4><p><strong>后期绑定：在运行时根据具体对象的类型进行绑定。</strong><br>若一种语言实现了后期绑定，同时必须提供一些机制，可在运行期间判断对象的类型，并分别调用适当的方法。也就是说，编译器此时依然不知道对象的类型，但方法调用机制能自己去调查，找到正确的方法主体。不同的语言对后期绑定的实现方法是有所区别的。但我们至少可以这样认为：它们都要在对象中安插某些特殊类型的信息。<strong>简明的说动态绑定就是指编译器在编译阶段不知道要调用哪个方法，运行期才能确定。</strong><font color=red>(编译看左边，运行看右边)</font></p>
+<h4 id="4、3-静态、动态绑定本质区别"><a href="#4、3-静态、动态绑定本质区别" class="headerlink" title="4、3.静态、动态绑定本质区别"></a>4、3.静态、动态绑定本质区别</h4><blockquote>
+<p>1、静态绑定是发生在编译阶段；而动态绑定是在运行阶段；<br> 2、静态绑定使用的是类信息，而动态绑定使用的是对象信息<br> 3、<font color=red><strong>重载方法(overloaded methods)使用的是静态绑定，而重写方法(overridden methods)使用的是动态绑定</strong></font></p>
+</blockquote>
+<h4 id="4、4-静态、动态绑定在程序中运行区别"><a href="#4、4-静态、动态绑定在程序中运行区别" class="headerlink" title="4、4.静态、动态绑定在程序中运行区别"></a>4、4.静态、动态绑定在程序中运行区别</h4><p>这个静态绑定例子以static方法为例，代码程序如下：</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">demoee</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Father5</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token class-name">StaticMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"粑粑：我是父类粑粑静态方法"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">class</span> <span class="token class-name">Son5</span> <span class="token keyword">extends</span> <span class="token class-name">Father5</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token class-name">StaticMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"熊孩子：我是子类熊孩砸静态方法"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> demooo <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token class-name">Father5</span> fat<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">Father5</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Father5</span> son<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">Son5</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">//特别注意这里是向上转型  也就是多态！</span>
+
+        <span class="token comment">//同时调用StaticMethod方法！</span>
+        <span class="token class-name"><span class="token namespace">fat<span class="token punctuation">.</span></span>StaticMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name"><span class="token namespace">son<span class="token punctuation">.</span></span>StaticMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+
+<p>运行结果</p>
+<blockquote>
+<p>粑粑：我是父类粑粑静态方法<br>熊孩子：我是子类熊孩砸静态方法</p>
+</blockquote>
+<p>根据上面的运行结果，我们也很好理解！子类重写了父类的一个叫做<font color=red><code>StaticMethod（）</code></font>的方法，由于是动态绑定，因此最后执行的是子类重写后的<font color=red><code>StaticMethod（）</code></font>方法。</p>
+<p>嗯哼？为了更好的理解静态、动态绑定在程序中运行区别，我们还是得看看下面这个程序：</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">class</span> <span class="token class-name">Father5</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token class-name">StaticMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"粑粑：我是父类粑粑静态方法"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">class</span> <span class="token class-name">Son5</span> <span class="token keyword">extends</span> <span class="token class-name">Father5</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token class-name">StaticMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"熊孩子：我是子类熊孩砸静态方法"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> demooo <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token class-name">Father5</span> fat<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">Father5</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Father5</span> son<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">Son5</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">//特别注意这里是向上转型  也就是多态！</span>
+
+        <span class="token class-name"><span class="token namespace">fat<span class="token punctuation">.</span></span>StaticMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//同时调用StaticMethod方法！</span>
+        <span class="token class-name"><span class="token namespace">son<span class="token punctuation">.</span></span>StaticMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+
+<blockquote>
+<p>千万注意哦，这个程序与第一个程序唯一不同之处就在于这个程序父类和子类的方法都是static的！</p>
+</blockquote>
+<p>运行结果：</p>
+<blockquote>
+<p>粑粑：我是父类粑粑静态方法<br>粑粑：我是父类粑粑静态方法</p>
+</blockquote>
+<p>从运行结果来看，我们可以很清楚的知道，子类静态方法语法上是做到了重写的作用，但实际上并没有做到真正意义上重写作用！只因为该方法是静态绑定！</p>
+<p>OK，get到了咩？如果get到了请点个赞呗，谢谢你~</p>
+<h1 id="5、-多态特性的虚方法（virtual）"><a href="#5、-多态特性的虚方法（virtual）" class="headerlink" title="5、 多态特性的虚方法（virtual）"></a>5、 多态特性的虚方法（virtual）</h1><p>虚方法出现在Java的多态特性中。</p>
+<p>父类与子类之间的多态性，对父类的函数进行重新定义。如果在子类中定义某方法与其父类有相同的名称和参数，我们说该方法被<font color=red>重写 (Overriding)</font>。在Java中，子类可继承父类中的方法，而不需要重新编写相同的方法。但有时子类并不想原封不动地继承父类的方法，而是想作一定的修改，这就需要采用方法的重写。方法重写又称方法覆盖。</p>
+<p>当设计类时，被重写的方法的行为怎样影响多态性。方法的重写使得子类能够重写父类的方法。当子类对象调用重写的方法时，调用的是子类的方法，而不是父类中被重写的方法。</p>
+<p>因此简单明了的理解Java虚方法方式你可以理解为java里所有父类中被重写的方法都是虚方法（virtual）差不多的意思就是该方法不会被子类使用到，使用到的都是子类中重写父类的方法，子类中的重写方法代替了它，因此也就有种名存实亡的感觉！</p>
+<p>在JVM字节码执行引擎中，方法调用会使用invokevirtual字节码指令来调用所有的虚方法。</p>
+<blockquote>
+<p>各位童鞋千万需要注意虚方法和抽象方法并不是同一个概念！</p>
+</blockquote>
+<h1 id="6、-重载属于多态吗？"><a href="#6、-重载属于多态吗？" class="headerlink" title="6、 重载属于多态吗？"></a>6、 重载属于多态吗？</h1><p>纵观重载与重写，重写是多态的特征体现无疑了！但是对于重载是不是多态的体现网上却议论纷纷！</p>
+<p>多态是基于对抽象方法的覆盖来实现的，用统一的对外接口来完成不同的功能。重载也是用统一的对外接口来完成不同的功能。那么两者有什么区别呢？</p>
+<p><strong>重载</strong><br>重载是指允许存在多个同名方法，而这些方法的参数不同。重载的实现是：编译器根据方法不同的参数表，对同名方法的名称做修饰。对于编译器而言，这些同名方法就成了不同的方法。它们的调用地址在编译期就绑定了。</p>
+<p><strong>多态</strong><br>多态是指子类重新定义父类的虚方法（virtual,abstract）。当子类重新定义了父类的虚方法后，父类根据赋给它的不同的子类，动态调用属于子类的该方法，这样的方法调用在编译期间是无法确定的。<br>不难看出，两者的区别在于编译器何时去寻找所要调用的具体方法，对于重载而言，在方法调用之前，编译器就已经确定了所要调用的方法，这称为“早绑定”或“静态绑定”；而对于多态，只有等到方法调用的那一刻，编译器才会确定所要调用的具体方法，这称为“晚绑定”或“动态绑定”。</p>
+<p>所以，你可以大可认为重载不属于多态，多态是对父类虚函数的重定义，不改变原虚函数的参数列表。重载是函数名相同，但参数列表不同。</p>
+<p>实际上这种问题没有严格的答案，就连教材书上都没提及。严格来说或狭义来讲，重载算多态还是有点牵强，传统的多态就是指父类和子类关系，但实际开发中都是理解重载是多态。这就是一个概念 你子类拥有你很多隐式父类的功能 那么你当然能扮演它们之中的某一个角色。</p>
+<blockquote>
+<p>总的来说，重载是不是多态这个问题以及不重要了，首当其冲的重要任务我觉得还是好好保护头发，然后就是养生了…</p>
+</blockquote>
+<h1 id="7、-向上转型"><a href="#7、-向上转型" class="headerlink" title="7、 向上转型"></a>7、 向上转型</h1><p>向上转型：多态本身是子类类型向父类类型向上转换的过程，其中，这个过程是默认的。你可以把这个过程理解为基本类型的小类型转大类型自动转换，不需要强制转换。 当<font color=red><strong>父类引用指向一个子类对象时，便是向上转型</strong></font>。 向上转型格式：</p>
+<blockquote>
+<p><font color=red>Father father = new Son();</font></p>
+<p>子类类型 变量名 = （子类类型）父类变量名；如：<font color=red>Son son = new Father();</font></p>
+</blockquote>
+<p>不知道你们有没有发现，向下转型的前提是父类对象指向的是子类对象（也就是说，在<font color=red><strong>向下转型之前，它得先向上转型</strong></font>），当然，向下转型还是有它的意义所在，下面就讲解向下转型的意义。</p>
+<p>到这里，我们讲解一下为什么要向下转型？上面已经讲到过当使用多态方式调用方法时，首先检查父类中是否有该方法，如果没有，则编译错误。也就是说，不能调用子类拥有，而父类没有的方法。编译都错误，更别说运行了。这也是多态给我们带来的一点”小麻烦”。所以，<font color=red>想要调用子类特有的方法，必须做向下转型。</font></p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token class-name">Demo</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span>  <span class="token class-name">Matcher</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"想吃烤山药？"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">XiongHaiZi</span> <span class="token keyword">extends</span> <span class="token class-name">Matcher</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"妈妈，我想吃烤山药"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eatSuLi</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span><span class="token comment">//============================子类特有的eatSuLi方法</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"麻麻，我想吃酥梨，要吃麻瓜那么大的酥梨"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Test</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        
+        <span class="token class-name">Matcher</span> m <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">XiongHaiZi</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//向上转型</span>
+        
+        <span class="token class-name">XiongHaiZi</span> x <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">XiongHaiZi</span><span class="token punctuation">)</span>m<span class="token punctuation">;</span><span class="token comment">//向下转型</span>
+        
+        x<span class="token punctuation">.</span><span class="token function">eatSuLi</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//执行子类特有方法</span>
+
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+    
+    运行结果：麻麻，我想吃酥梨，要吃麻瓜那么大的酥梨</code></pre>
+
+<p>好了向下转型就讲到这里…等等，你真的以为就讲完了？肯定不行喽，向下转型还有一个要说的知识，讲之前先来看个程序先</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token class-name">Demo</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span>  <span class="token class-name">Matcher</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"想吃烤山猪？"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Boy</span> <span class="token keyword">extends</span> <span class="token class-name">Matcher</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eatKaoYang</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"妈妈，我想吃烤山猪"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Girl</span> <span class="token keyword">extends</span> <span class="token class-name">Matcher</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eatKaoYang</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"妈妈，我想吃烤山猪2333"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Test</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+
+        <span class="token class-name">Matcher</span> g <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Girl</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//向上转型编译通过</span>
+
+        <span class="token class-name">Boy</span> x <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">Boy</span><span class="token punctuation">)</span>g<span class="token punctuation">;</span><span class="token comment">//向下转型</span>
+
+        x<span class="token punctuation">.</span><span class="token function">eatKaoYang</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//编译通过,但运行报ClassCastException</span>
+
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+    
+ 运行结果：  运行报<span class="token class-name">ClassCastException</span></code></pre>
+
+<p>这段代码可以通过编译，但是运行时，却报出了 <font color=red>ClassCastException</font> ，类型转换异常！这是因为，明明创建了<font color=red>Girl</font>类型对象，运行时，当然不能转换成<font color=red>Boy</font>对象的。这两个类型并没有任何继承关系，不符合类型转换的定义。</p>
+<blockquote>
+<p>而且上面也提到过了<font color=red><strong>向下转型之前，它得先向上转型</strong></font>，而这里显然向上转型转的也不是Boy，也就是说根本没有向上转型哈</p>
+</blockquote>
+<p>为了避免<font color=red>ClassCastException</font>的发生，Java提供了<font color=red> instanceof </font>关键字，给引用变量做类型的校验。</p>
+<h4 id="8、1-instanceof的使用"><a href="#8、1-instanceof的使用" class="headerlink" title="8、1. instanceof的使用"></a>8、1. instanceof的使用</h4><p><font color=red><code>instanceof</code></font> 的格式：</p>
+<p>变量名instanceof数据类型</p>
+<p><font color=red><code>instanceof</code></font> 的使用<br> 如果变量属于该数据类型，返回true。<br> 如果变量不属于该数据类型，返回false。</p>
+<p>所以，转换之前，我们最好使用<font color=red><code>instanceof</code></font>先做一个判断，代码如下：</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token class-name">Demo</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span>  <span class="token class-name">Matcher</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"想吃烤山药？"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Boy</span> <span class="token keyword">extends</span> <span class="token class-name">Matcher</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eatKaoYang</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Boy：妈妈，我想吃烤羊"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">Girl</span> <span class="token keyword">extends</span> <span class="token class-name">Matcher</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eatKaoYang</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Girl：妈妈，我想吃烤全羊2333"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Test</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+
+        <span class="token class-name">Matcher</span> g <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Girl</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//向上转型</span>
+
+        <span class="token keyword">if</span><span class="token punctuation">(</span>g <span class="token keyword">instanceof</span> <span class="token class-name">Girl</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+            <span class="token class-name">Girl</span> x <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">Girl</span><span class="token punctuation">)</span>g<span class="token punctuation">;</span><span class="token comment">//向下转型</span>
+            x<span class="token punctuation">.</span><span class="token function">eatKaoYang</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//=====================调用Girl的eatKaoYang()方法</span>
+        <span class="token punctuation">&#125;</span><span class="token keyword">else</span> <span class="token keyword">if</span><span class="token punctuation">(</span>g <span class="token keyword">instanceof</span> <span class="token class-name">Boy</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span> <span class="token comment">//不执行</span>
+            <span class="token class-name">Boy</span> x <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">Boy</span><span class="token punctuation">)</span>g<span class="token punctuation">;</span><span class="token comment">//向下转型</span>
+            x<span class="token punctuation">.</span><span class="token function">eatKaoYang</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//=====================调用Boy的eatKaoYang()方法</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+运行结果： <span class="token class-name">Girl</span>：妈妈，我想吃烤全羊<span class="token number">2333</span></code></pre>
+
+<p>好了到这里，你get到了咩？</p>
+<h1 id="9、-向上向下转型再次分析【加餐不加价】"><a href="#9、-向上向下转型再次分析【加餐不加价】" class="headerlink" title="9、 向上向下转型再次分析【加餐不加价】"></a>9、 向上向下转型再次分析【加餐不加价】</h1><p>看完之后是不是还是不够清晰向上向下转型？多态转型问题其实并不复杂，只要记住一句话：<font color=red><strong>父类引用指向子类对象</strong></font>。那什么叫父类引用指向子类对象？看下面例子吧</p>
+<p>有两个类，<font color=red><code>Father</code></font> 是父类，<font color=red><code>Son</code></font> 类继承自<font color=red> <code>Father</code></font>。</p>
+<p>第 1 个例子：</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token comment">//  f1 引用指向一个Son对象</span>
+<span class="token class-name">Father</span> f1 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Son</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment">// 这就叫 upcasting （向上转型)</span>
+<span class="token comment">// f1 还是指向 Son对象</span>
+<span class="token class-name">Son</span> s1 <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">Son</span><span class="token punctuation">)</span>f1<span class="token punctuation">;</span>   <span class="token comment">// 这就叫 downcasting (向下转型)</span></code></pre>
+
+<p>第 2 个例子：</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token comment">// f1现在指向father对象</span>
+<span class="token class-name">Father</span> f2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Father</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">Son</span> s2 <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">Son</span><span class="token punctuation">)</span>f2<span class="token punctuation">;</span>       <span class="token comment">// 出错，子类引用不能指向父类对象</span></code></pre>
+
+<p>你或许会问，第1个例子中：<font color=red>Son s1 = (Son) f1; </font>为什么是正确的呢。很简单因为<font color=red> f1</font> 指向一个子类对象，<font color=red>Father f1 = new Son();</font> 子类 <font color=red>s1</font> 引用当然可以指向子类对象了。</p>
+<p>而 <font color=red>f2</font> 被传给了一个<font color=red> Father </font>对象，<font color=red>Father f2 = new Father();</font> 子类 <font color=red>s2</font> 引用不能指向父类对象。</p>
+<h1 id="10、-多态与构造器之间的微妙"><a href="#10、-多态与构造器之间的微妙" class="headerlink" title="10、 多态与构造器之间的微妙"></a>10、 多态与构造器之间的微妙</h1><p>直接上代码：</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token class-name">Polymorphic</span><span class="token punctuation">;</span>
+
+<span class="token keyword">class</span> <span class="token class-name">EatKaoShanYao</span> <span class="token punctuation">&#123;</span>
+    <span class="token class-name">EatKaoShanYao</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"吃烤山药之前..."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"吃烤山药之后(熊孩子懵逼中)...."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"7岁半就喜欢吃烤山药"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">KaoShanYao</span> <span class="token keyword">extends</span> <span class="token class-name">EatKaoShanYao</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> <span class="token class-name">Weight</span> <span class="token operator">=</span> <span class="token string">"110斤"</span><span class="token punctuation">;</span>
+    <span class="token keyword">public</span> <span class="token class-name">KaoShanYao</span><span class="token punctuation">(</span><span class="token class-name">String</span> <span class="token class-name">Weight</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token class-name"><span class="token namespace">this<span class="token punctuation">.</span></span>Weight</span> <span class="token operator">=</span> <span class="token class-name">Weight</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"熊孩子的体重："</span> <span class="token operator">+</span> <span class="token class-name"><span class="token namespace">this<span class="token punctuation">.</span></span>Weight</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token comment">// 子类覆盖父类方法</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"熊孩子吃烤山药之前的体重是："</span> <span class="token operator">+</span> <span class="token class-name"><span class="token namespace">this<span class="token punctuation">.</span></span>Weight</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token comment">//Main方法</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+           <span class="token class-name">EatKaoShanYao</span> k <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">KaoShanYao</span><span class="token punctuation">(</span><span class="token string">"250斤"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                      
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+
+<p>童鞋们可以试想一下运行结果，再看下面的输出结果</p>
+<pre class="language-makedown" data-language="makedown"><code class="language-makedown">运行结果：
+               吃烤山药之前...
+               熊孩子吃烤山药之前的体重是：null
+               吃烤山药之后(熊孩子懵逼中)....
+               熊孩子的体重：250斤</code></pre>
+
+<p>是不是很疑惑？结果为啥是这样？你看，熊孩子又懵逼了，Why？</p>
+<p>原因其实很简单，因为在创建子类对象时，会先去调用父类的构造器，而父类构造器中又调用了被子类覆盖的多态方法，由于父类并不清楚子类对象中的属性值是什么（先初始化父类的时候还没开始初始化子类），于是把<font color=red>String</font>类型的属性暂时初始化为默认值<font color=red>null</font>，然后再调用子类的构造器（这个时子类构造器已经初始<font color=red>Weight</font>属性，所以子类构造器知道熊孩子的体重<font color=red>Weight</font>是250）。</p>
+<blockquote>
+<p>如果有什么不理解的可以及时告诉我，楼主一直都在，还有如果楼主哪里写错了或者理解错了，请及时告诉我，一定要告诉我！！！</p>
+</blockquote>
+<h1 id="11、-多态的优点"><a href="#11、-多态的优点" class="headerlink" title="11、 多态的优点"></a>11、 多态的优点</h1><p>讲了这么久的多态，我觉得其优点已经不明觉厉了。但是还是来聊聊多态在实际开发的过程中的优点。在实际开发中父类类型作为方法形式参数，传递子类对象给方法，进行方法的调用，更能体现出多态的扩展 性与便利。<br> 为了更好的对比出多态的优点，下面程序不使用多态，代码如下：</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token class-name">Demo</span><span class="token punctuation">;</span>
+<span class="token comment">//父类：动物类</span>
+<span class="token keyword">class</span> <span class="token class-name">Animal</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"eat"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token comment">//猫类</span>
+<span class="token keyword">class</span> <span class="token class-name">Cat</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">//方法重写</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"猫吃猫骨头"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">call</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"猫叫"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token comment">//狗类</span>
+<span class="token keyword">class</span> <span class="token class-name">Dog</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"狗吃狗骨头"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">call</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"狗叫"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">//针对动物操作的工具类</span>
+<span class="token keyword">class</span> <span class="token class-name">AnimalTool</span><span class="token punctuation">&#123;</span>
+
+    <span class="token keyword">private</span> <span class="token class-name">AnimalTool</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token comment">//把工具类的构造方法私有，防止别人创建该类的对象。</span>
+
+    <span class="token comment">//调用猫的功能</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">catLife</span><span class="token punctuation">(</span><span class="token class-name">Cat</span> c<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>  <span class="token comment">//工具类，方法就写成static的，然后直接在测试类：工具类名.方法 使用。</span>
+        c<span class="token punctuation">.</span><span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        c<span class="token punctuation">.</span><span class="token function">call</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token comment">//调用狗的功能</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">dogLife</span><span class="token punctuation">(</span><span class="token class-name">Dog</span> d<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        d<span class="token punctuation">.</span><span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        d<span class="token punctuation">.</span><span class="token function">call</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Test</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+
+        <span class="token class-name">Cat</span> c<span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Cat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">AnimalTool</span><span class="token punctuation">.</span><span class="token function">catLife</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token class-name">Dog</span> d<span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Dog</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">AnimalTool</span><span class="token punctuation">.</span><span class="token function">dogLife</span><span class="token punctuation">(</span>d<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+运行结果：
+		猫吃猫骨头
+		猫叫
+		狗吃狗骨头
+		狗叫</code></pre>
+
+<p>这里只写了两只动物，如果再来一种动物猪，则需要定义个猪类，提供猪的两个方法，再到工具类中添加对应的<font color=red>XXLife</font>方法，这三步都是必须要做的，而且每多一种动物就需要在工具类中添加一种一个对应的<font color=red>XXLife</font>方法，这样维护起来就很麻烦了，毕竟动物种类成千上万！崩溃吧，没事多态来拯救你，如下使用多态代码：</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token class-name">Demo</span><span class="token punctuation">;</span>
+<span class="token comment">//父类：动物类</span>
+<span class="token keyword">class</span> <span class="token class-name">Animal</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"eat"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">call</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"call"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token comment">//猫类</span>
+<span class="token keyword">class</span> <span class="token class-name">Cat</span> <span class="token keyword">extends</span> <span class="token class-name">Animal</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">//方法重写</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"猫吃猫骨头"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">call</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"猫叫"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token comment">//狗类</span>
+<span class="token keyword">class</span> <span class="token class-name">Dog</span> <span class="token keyword">extends</span> <span class="token class-name">Animal</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"狗吃狗骨头"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">call</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"狗叫"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">//针对动物操作的工具类</span>
+<span class="token keyword">class</span> <span class="token class-name">AnimalTool</span><span class="token punctuation">&#123;</span>
+
+    <span class="token keyword">private</span> <span class="token class-name">AnimalTool</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token comment">//最好把工具类的构造方法私有，防止别人创建该类的对象。该类是工具类。</span>
+
+    <span class="token comment">//调用所以动物的功能</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">animalLife</span><span class="token punctuation">(</span><span class="token class-name">Animal</span> a<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>  <span class="token comment">//工具类，方法就写成static的，然后直接在测试类：工具类名.方法 使用。</span>
+        a<span class="token punctuation">.</span><span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        a<span class="token punctuation">.</span><span class="token function">call</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Test</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+
+        <span class="token class-name">Cat</span> c<span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Cat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">AnimalTool</span><span class="token punctuation">.</span><span class="token function">animalLife</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token class-name">Dog</span> d<span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Dog</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">AnimalTool</span><span class="token punctuation">.</span><span class="token function">animalLife</span><span class="token punctuation">(</span>d<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+运行结果：
+		猫吃猫骨头
+		猫叫
+		狗吃狗骨头
+		狗叫</code></pre>
+
+<blockquote>
+<p>注意： 上面动物类都继承了<font color=red><code>animal</code></font>父类</p>
+</blockquote>
+<p>这个时候再分析，如果再来一种动物猪，则需要定义个猪类，提供猪的两个方法，再继承<font color=red><code>Animal</code></font>父类，这个时候就不需要在工具类中添加对应的<font color=red><code>XxLife</code></font>方法，只写一个<font color=red><code>animalLife</code></font>方法即可，而且每多一种动物都不需要在工具类中添加对应的<font color=red><code>XxLife</code></font>方法，这样维护起来就很乐观了。</p>
+<p>由于多态特性的支持，<font color=red>animalLife</font>方法的<font color=red>Animal</font>类型，是<font color=red>Cat</font>和<font color=red>Dog</font>的父类类型，父类类型接收子类对象，当 然可以把<font color=red>Cat</font>对象和<font color=red>Dog</font>对象传递给方法。 当<font color=red>eat</font>和<font color=red>call</font>方法执行时，多态规定，执行的是子类重写的方法，那么效果自然与<font color=red>Animal</font>的子类中的<font color=red>eat</font>、<font color=red>call</font>方法一致， 所以<font color=red>animalLife</font>完全可以替代以上两方法。 不仅仅是替代，在扩展性方面，无论之后再多的子类出现，我们都不需要编写<font color=red>XxLife</font>方法了，直接使用<font color=red> animalLife</font>就可以完成。 所以，多态的好处，体现在可以使程序编写的更简单，并有良好的扩展。</p>
+<h1 id="12、-分析开篇的九个问题"><a href="#12、-分析开篇的九个问题" class="headerlink" title="12、 分析开篇的九个问题"></a>12、 分析开篇的九个问题</h1><p>看到这里，相信童鞋们多多少少都应该对多态都一定的了解了，都应该很有信心解决开篇的难题了吧，我可以很负责的告诉你，文章看到这里，你依旧解决不了这几个问题，不要问我为啥知道，你可以试着再做一遍，代码贴在下面：</p>
+<pre class="language-java" data-language="java"><code class="language-java"><span class="token keyword">package</span> <span class="token class-name">Polymorphic</span><span class="token punctuation">;</span>
+<span class="token comment">//爷爷类</span>
+<span class="token keyword">class</span> <span class="token class-name">Ye</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">show</span><span class="token punctuation">(</span><span class="token class-name">Sun</span> obj<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token string">"Ye and Sun"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">show</span><span class="token punctuation">(</span><span class="token class-name">Ye</span> obj<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token string">"Ye and Ye"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+<span class="token punctuation">&#125;</span>
+<span class="token comment">//爸爸类</span>
+<span class="token keyword">class</span> <span class="token class-name">Fu</span> <span class="token keyword">extends</span> <span class="token class-name">Ye</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">show</span><span class="token punctuation">(</span><span class="token class-name">Fu</span> obj<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token string">"Fu and Fu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">show</span><span class="token punctuation">(</span><span class="token class-name">Ye</span> obj<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token string">"Fu and Ye"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token comment">//儿子类</span>
+<span class="token keyword">class</span> <span class="token class-name">Zi</span> <span class="token keyword">extends</span> <span class="token class-name">Fu</span> <span class="token punctuation">&#123;</span>
+
+<span class="token punctuation">&#125;</span>
+<span class="token comment">//孙子类</span>
+<span class="token keyword">class</span> <span class="token class-name">Sun</span> <span class="token keyword">extends</span> <span class="token class-name">Fu</span> <span class="token punctuation">&#123;</span>
+
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">PolymorphicTest</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+         <span class="token class-name">Ye</span> y <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Ye</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Ye</span> y2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Fu</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">//向上</span>
+        <span class="token class-name">Fu</span> f <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Fu</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Zi</span> z <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Zi</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Sun</span> s <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Sun</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第一题 "</span> <span class="token operator">+</span> y<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>f<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第二题 "</span> <span class="token operator">+</span> y<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>z<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第三题 "</span> <span class="token operator">+</span> y<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第四题 "</span> <span class="token operator">+</span> y2<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>f<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">//到这里挂了？？？</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第五题 "</span> <span class="token operator">+</span> y2<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>z<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第六题 "</span> <span class="token operator">+</span> y2<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第七题 "</span> <span class="token operator">+</span> f<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>f<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第八题 "</span> <span class="token operator">+</span> f<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>z<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"第九题 "</span> <span class="token operator">+</span> f<span class="token punctuation">.</span><span class="token function">show</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+     
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+打印结果：
+    第一题 <span class="token class-name">Ye</span> and <span class="token class-name">Ye</span>
+	第二题 <span class="token class-name">Ye</span> and <span class="token class-name">Ye</span>
+	第三题 <span class="token class-name">Ye</span> and <span class="token class-name">Sun</span>
+	第四题 <span class="token class-name">Fu</span> and <span class="token class-name">Ye</span>
+	第五题 <span class="token class-name">Fu</span> and <span class="token class-name">Ye</span>
+	第六题 <span class="token class-name">Ye</span> and <span class="token class-name">Sun</span>
+	第七题 <span class="token class-name">Fu</span> and <span class="token class-name">Fu</span>
+	第八题 <span class="token class-name">Fu</span> and <span class="token class-name">Fu</span>
+	第九题 <span class="token class-name">Ye</span> and <span class="token class-name">Sun</span></code></pre>
+
+<p>要想理解上面这个例子，童鞋们必须读懂这句话：<font color=red><strong>当父类对象引用变量引用子类对象时，被引用对象的类型决定了调用谁的成员方法，引用变量类型决定可调用的方法。首先会先去可调用的方法的父类中寻找，找到了就执行子类中覆盖的该方法，就算子类中有现成的该方法，它同样也会去父类中寻找，早到后未必执行子类中有现成的方法，而是执行重写在父类中找到的方法的子类方法（这里的子类也就是最后决定调用的类方法）。</strong></font>你是不是晕了？读着都觉得拗口，要理解可就拗的不是口了而是拗头<font size=1> 啥玩意没听过这个词 </font>咳咳，问题不大，楼主来通俗的给大家讲解，让大家理解。</p>
+<p>还记不记得楼主之前定义向上转型是怎么定义的？</p>
+<blockquote>
+<p>【v8提示】 向上转型：多态本身是子类类型向父类类型向上转换的过程，其中，这个过程是默认的。你可以把这个过程理解为基本类型的小类型转大类型自动转换，不需要强制转换。 当<font color=red><strong>父类引用指向一个子类对象时，便是向上转型</strong></font></p>
+</blockquote>
+<p>可是，你真的理解了咩？什么叫做父类对象引用变量引用子类对象？其实还得从下面这句话找头绪</p>
+<blockquote>
+<p>向上转型定义：多态本身是子类类型向父类类型向上转换的过程，其中，这个过程是默认的</p>
+</blockquote>
+<p>就好比<font color=red>Father f = new Son()；</font>有的童鞋就会说这个f也算是父类的对象引用？如果按字面理解是子类的引用只不过该引用的类型为<font color=red>Father</font>类型？这时你就大错特错了。</p>
+<p>我们把向上转型定义简化一下理解一下，简化如下：</p>
+<blockquote>
+<p>子类类型默认向父类类型向上转换的过程</p>
+</blockquote>
+<p>现在明白了咩？这句话可以理解为<font color=red>Father f = new Son()</font>这句代码原本是<font color=red>Father f = （Father ）new Son()</font>这样子的只是这个转换过程是默认自动转的，总的来说也就是<font color=red> new Son()</font>其实本质就是<font color=red>new Father</font>，所以<font color=red>f</font>其实就是父类对象引用！这个时候再来拆开理解下面这段话</p>
+<blockquote>
+<p><font color=red><strong>当父类对象引用变量引用子类对象时</strong></font></p>
+</blockquote>
+<p>其中<font color=red><strong>父类对象引用变量</strong></font>指的就是<font color=red><code>f</code></font>，<font color=red><strong>子类对象</strong></font>指的就是<font color=red><code>new Son（）</code></font>，所以加起来就是当<font color=red>f</font>引用<font color=red><code>new Son（）</code></font>时</p>
+<blockquote>
+<p><font color=red><strong>被引用对象的类型决定了调用谁的成员方法，引用变量类型决定可调用的方法。</strong></font></p>
+</blockquote>
+<p>这里的 被引用对象的类型则是指<font color=red>new Son（）</font>对象中的<font color=red>Son</font>类型， 引用变量类型则是指<font color=red>f</font>的类型<font color=red>Father</font>类型</p>
+<p>好了总结关联起来就是当：<font color=red>f</font>引用<font color=red>new Son（）</font>时，<font color=red>Son</font>决定了调用它的成员方法，<font color=red>Father</font>决定可调用<font color=red>Father</font>中的方法。所以以<font color=red>Father f = new Son()</font>举例，简单来说就是</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/notes/se/three_characteristics/extends/7.png" alt="7" loading="lazy"></p>
+<h1 id="13、-最后我们一起来正式分析那九个题"><a href="#13、-最后我们一起来正式分析那九个题" class="headerlink" title="13、 最后我们一起来正式分析那九个题"></a>13、 最后我们一起来正式分析那九个题</h1><p>前三个并没有涉及到多态（向上转型），所以只会调用<font color=red>yeye</font>本类的方法，这里只要掌握继承的知识就OK了。</p>
+<p>讲解第四题之前，你的答案是不是<font color=red>“Fu and Fu”</font>？来了喔，马上让你巅覆对多态的人生观！</p>
+<p>分析第四题，首先<font color=red>Ye y2 = new Fu();</font> 向上转型了，所以首先会去<font color=red>Fu</font>类的父类<font color=red>Ye</font>类中找<font color=red>show(f)</font>方法，找到了<font color=red>show(Ye obj)</font>方法，之后回到<font color=red>Fu</font>类中看是否有<font color=red>show(Ye obj)</font>重写方法，发现<font color=red>Fu</font>类有<font color=red>show(Ye obj)</font>方法（重写），所以最后执行了<font color=red>“Fu and Ye”</font>，你get了咩？</p>
+<p>分析第五题，其实第五题和第四题基本差不多，第四题是<font color=red>y2.show(f)；</font>第五题是<font color=red>y2.show(z)；</font>只是<font color=red>show</font>的方法参数不同，相同的是<font color=red>f</font>和<font color=red>z</font>在<font color=red>Ye</font>类中找的都是<font color=red>show(Ye obj)</font>方法，所以，最终第四题和第五题结果一致！</p>
+<p>分析第六题，第六题其实挺有趣，首先<font color=red>y2.show(s)</font>，到<font color=red>Ye</font>类中找到<font color=red>show(Sun obj)</font>，之后在子类中看有没有重写，发现并没有<font color=red>show(Sun obj)</font>重写方法，确定没有咩？别忘了这是继承，子类<font color=red>Fu</font>中默认有着父类<font color=red>Ye</font>的方法，只是没有表面表示出来，从另一角度出发，<font color=red>Fu</font>类中默认重写了一个<font color=red>show(Sun obj)</font>方法，就算不写也是存在的，所以运行结果为<font color=red>“Ye and Sun”</font></p>
+<p>第七、八题就不分析了，毕竟也没有涉及到向上转型（多态）。</p>
+<p>最后分析一下第九题，有的童鞋就要打楼主了，第九题不也是没有涉及到向上转型（多态）吗，楼主你个星星（**），当然，楼主就算背着黑锅也要分析第九题就是这么傲娇，确实没有涉及到向上转型（多态），我要讲的原因很简单，因为我觉得还是很有必要！首先<font color=red>f.show(s)</font>不涉及多态，它只会调用自己类<font color=red>（Fu）</font>的方法，但是你会发现<font color=red>Fu</font>中并没有<font color=red>show(s)</font>，唉唉唉，我运行你重新组织下语言，又忘了？这是继承啊，它有默认父类<font color=red>Ye</font>中的<font color=red>show(Sun obj)</font>方法鸭！好了到这里，我总结出一点，你多态以及没得问题了，不过你继承方面知识薄弱啊，不行不行楼主得给你补补，还在犹豫什么鸭，快来补补继承知识！！！</p>
+</div><div id="reward-container"><span class="hty-icon-button button-glow" id="reward-button" title="打赏" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === &quot;none&quot;) ? &quot;block&quot; : &quot;none&quot;;"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-hand-coin-line"></use></svg></span><div id="reward-comment">我很可爱，请给我钱</div><div id="qr" style="display:none;"><div style="display:inline-block"><a target="_blank" rel="noopener" href="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/medias/reward/alipay.jpg"><img loading="lazy" src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/medias/reward/alipay.jpg" alt="支付宝" title="支付宝"></a><div><span style="color:#00A3EE"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-alipay-line"></use></svg></span></div></div><div style="display:inline-block"><a target="_blank" rel="noopener" href="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/medias/reward/wechat.png"><img loading="lazy" src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/medias/reward/wechat.png" alt="微信支付" title="微信支付"></a><div><span style="color:#2DC100"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-wechat-pay-line"></use></svg></span></div></div></div></div><ul class="post-copyright"><li class="post-copyright-author"><strong>本文作者：</strong>xinzhu</li><li class="post-copyright-link"><strong>本文链接：</strong><a href="https://xinzhu37.github.io/note/knowledge/JAVASE/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3java%E5%A4%9A%E6%80%81%E6%B2%A1%E6%9C%89%E7%83%A4%E5%B1%B1%E8%8D%AF%E7%9A%84%E5%AD%98%E5%9C%A8%EF%BC%8Cjava%E5%B0%B1%E4%B8%8D%E9%A6%99%E4%BA%86%E5%90%97%EF%BC%9F/" title="深入理解java多态没有烤山药的存在，java就不香了吗？">https://xinzhu37.github.io/note/knowledge/JAVASE/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3java%E5%A4%9A%E6%80%81%E6%B2%A1%E6%9C%89%E7%83%A4%E5%B1%B1%E8%8D%AF%E7%9A%84%E5%AD%98%E5%9C%A8%EF%BC%8Cjava%E5%B0%B1%E4%B8%8D%E9%A6%99%E4%BA%86%E5%90%97%EF%BC%9F/</a></li><li class="post-copyright-license"><strong>版权声明：</strong>本博客所有文章除特别声明外，均默认采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener" title="CC BY-NC-SA 4.0 "><svg class="icon"><use xlink:href="#icon-creative-commons-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-by-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-nc-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-sa-line"></use></svg></a> 许可协议。</li></ul></section></article><div class="post-nav"><div class="post-nav-item"><a class="post-nav-prev" href="/note/knowledge/JVM/%E8%BF%99%E8%B4%A7%E5%88%B0%E5%BA%95%E8%BF%98%E6%98%AF%E4%B8%8D%E6%98%AF%E5%9E%83%E5%9C%BE%EF%BC%9F%E3%80%90%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6GC%E7%AE%97%E6%B3%95JVM%E7%AF%87%E5%9B%9B%E3%80%91/" rel="prev" title="这货到底还是不是垃圾？【垃圾回收GC算法JVM篇四】"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-arrow-left-s-line"></use></svg><span class="post-nav-text">这货到底还是不是垃圾？【垃圾回收GC算法JVM篇四】</span></a></div><div class="post-nav-item"><a class="post-nav-next" href="/note/knowledge/JAVASE/java%E7%BB%A7%E6%89%BF%E4%BB%8E%E2%80%9C%E6%88%91%E7%88%B8%E6%98%AF%E6%9D%8E%E5%88%9A%E2%80%9D%E8%AE%B2%E8%B5%B7/" rel="next" title="java继承从“我爸是李刚”讲起"><span class="post-nav-text">java继承从“我爸是李刚”讲起</span><svg class="icon" aria-hidden="true"><use xlink:href="#icon-arrow-right-s-line"></use></svg></a></div></div></div><div class="hty-card" id="comment"><div class="comment-tooltip text-center"><span>如果您有任何关于博客内容的相关讨论，欢迎前往 <a href="https://github.com/xinzhu37/xinzhu37.github.io/issues" target="_blank">GitHub issues</a> 与我交流。</span><br></div></div></main><footer class="sidebar-translate" id="footer"><div class="copyright"><span>&copy; 2020 – 2022 </span><span class="with-love" id="animate"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-cloud-line"></use></svg></span><span class="author"> xinzhu</span></div><div class="powered"><span>由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动 v5.4.0</span><span class="footer-separator">|</span><span>主题 - <a rel="noopener" href="https://github.com/YunYouJun/hexo-theme-yun" target="_blank"><span>Yun</span></a> v1.6.1</span></div><div class="live_time"><span>本博客已运行</span><span id="display_live_time"></span><span class="moe-text">(●'◡'●)</span><script>function blog_live_time() {
+  setTimeout(blog_live_time, 1000);
+  const start = new Date('2020-09-30T00:00:00');
+  const now = new Date();
+  const timeDiff = (now.getTime() - start.getTime());
+  const msPerMinute = 60 * 1000;
+  const msPerHour = 60 * msPerMinute;
+  const msPerDay = 24 * msPerHour;
+  const passDay = Math.floor(timeDiff / msPerDay);
+  const passHour = Math.floor((timeDiff % msPerDay) / 60 / 60 / 1000);
+  const passMinute = Math.floor((timeDiff % msPerHour) / 60 / 1000);
+  const passSecond = Math.floor((timeDiff % msPerMinute) / 1000);
+  display_live_time.innerHTML = " " + passDay + " 天 " + passHour + " 小时 " + passMinute + " 分 " + passSecond + " 秒";
+}
+blog_live_time();
+</script></div></footer><a class="hty-icon-button" id="back-to-top" aria-label="back-to-top" href="#"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-arrow-up-s-line"></use></svg><svg class="progress-circle-container" viewBox="0 0 100 100"><circle class="progress-circle" id="progressCircle" cx="50" cy="50" r="48" fill="none" stroke="#0078E7" stroke-width="2" stroke-linecap="round"></circle></svg></a></div></body></html>
