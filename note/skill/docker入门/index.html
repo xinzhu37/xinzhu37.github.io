@@ -1,0 +1,1210 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#0078E7"><meta name="author" content="xinzhu"><meta name="copyright" content="xinzhu"><meta name="generator" content="Hexo 5.4.0"><meta name="theme" content="hexo-theme-yun"><title>Docker入门 | 心竹的小镇</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@900&amp;display=swap" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/star-markdown-css@0.1.25/dist/yun/yun-markdown.min.css"><script src="//at.alicdn.com/t/font_1140697_dxory92pb0h.js" async></script><script src="https://cdn.jsdelivr.net/npm/scrollreveal/dist/scrollreveal.min.js" defer></script><script>document.addEventListener("DOMContentLoaded", () => {
+  [".post-card",".post-content img"].forEach((target)=> {
+    ScrollReveal().reveal(target);
+  })
+});
+</script><link id="light-prism-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@latest/themes/prism.css" media="(prefers-color-scheme: light)"><link id="dark-prism-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@latest/themes/prism-tomorrow.css" media="(prefers-color-scheme: dark)"><link rel="icon" href="/yun.svg"><link rel="mask-icon" href="/yun.svg" color="#0078E7"><link rel="alternate icon" href="/yun.ico"><link rel="preload" href="/css/hexo-theme-yun.css" as="style"><link rel="preload" href="/js/utils.js" as="script"><link rel="preload" href="/js/hexo-theme-yun.js" as="script"><link rel="prefetch" href="/js/sidebar.js" as="script"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><script id="yun-config">
+    const Yun = window.Yun || {};
+    window.CONFIG = {"hostname":"xinzhu37.github.io","root":"/","title":"心竹君的小站","version":"1.6.1","mode":"auto","copycode":true,"page":{"isPost":true},"i18n":{"placeholder":"搜索...","empty":"找不到您查询的内容: ${query}","hits":"找到 ${hits} 条结果","hits_time":"找到 ${hits} 条结果（用时 ${time} 毫秒）"},"anonymous_image":"https://cdn.jsdelivr.net/gh/YunYouJun/cdn/img/avatar/none.jpg","say":{"api":"https://el-bot-api.vercel.app/api/words/young"},"fireworks":{"colors":["102, 167, 221","62, 131, 225","33, 78, 194"]}};
+  </script><link rel="stylesheet" href="/css/hexo-theme-yun.css"><script src="/js/utils.js"></script><script src="/js/hexo-theme-yun.js"></script><link rel="alternate" href="/atom.xml" title="心竹的小镇" type="application/atom+xml"><link rel="preconnect" href="https://www.google-analytics.com" crossorigin><script async src="https://www.googletagmanager.com/gtag/js?id=G-1LL0D86CY9"></script><script>if (CONFIG.hostname === location.hostname) {
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-1LL0D86CY9');
+}</script><script data-ad-client="ca-pub-2245427233262012" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><script>(function(){
+  var bp = document.createElement('script');
+  var curProtocol = window.location.protocol.split(':')[0];
+  if (curProtocol === 'https') {
+    bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+  }
+  else {
+    bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+  }
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(bp, s);
+})();</script><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-M9KWR9L');</script><!-- End Google Tag Manager --><meta name="description" content="Docker入门0.学习目标 了解docker和虚拟机的区别 会操作Docker拉取镜像运行容器 会编写Dockerfile 会用Docker部署常见应用  1.认识Docker本节会带着大家了解Docker，以及Docker中的一些基本概念。 1.1.什么是DockerDocker 最初是 dotCloud 公司创始人 Solomon Hykes 在法国期间发起的一个公司内部项目，它是基于 do">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker入门">
+<meta property="og:url" content="https://xinzhu37.github.io/note/skill/docker%E5%85%A5%E9%97%A8/index.html">
+<meta property="og:site_name" content="心竹的小镇">
+<meta property="og:description" content="Docker入门0.学习目标 了解docker和虚拟机的区别 会操作Docker拉取镜像运行容器 会编写Dockerfile 会用Docker部署常见应用  1.认识Docker本节会带着大家了解Docker，以及Docker中的一些基本概念。 1.1.什么是DockerDocker 最初是 dotCloud 公司创始人 Solomon Hykes 在法国期间发起的一个公司内部项目，它是基于 do">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/1542112444492.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707173629578.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200701203056621.png">
+<meta property="og:image" content="https://xinzhu37.github.io/note/skill/docker%E5%85%A5%E9%97%A8/assets/image-20200713163342273.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/install-mac-dmg.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/install-mac-apps.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/install-mac-menubar.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200706170650377.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200706171154976.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200706171550370.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200706170952725.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200706171801818.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200706173524175.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707090831324.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707104639057.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707105300276.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707105630249.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707110928154.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707115350664.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707161128677.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707161538416.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707164946938.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707172721655.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707173537790.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200708114809830.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200708114940143.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200708155747419.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200708161724629.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200708161757012.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200713095425432.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200713100051057.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200713100444257.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200713100655932.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200713101001928.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200109155129995.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/1571023657710.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/1542112444492.png">
+<meta property="article:published_time" content="2021-06-25T06:06:00.000Z">
+<meta property="article:modified_time" content="2021-06-25T06:06:00.000Z">
+<meta property="article:author" content="xinzhu">
+<meta property="article:tag" content="分享">
+<meta property="article:tag" content="笔记">
+<meta property="article:tag" content="Docker">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/1542112444492.png"><script src="/js/ui/mode.js"></script></head><body><script defer src="https://cdn.jsdelivr.net/npm/animejs@latest"></script><script defer src="/js/ui/fireworks.js"></script><canvas class="fireworks"></canvas><div class="container"><a class="sidebar-toggle hty-icon-button" id="menu-btn"><div class="hamburger hamburger--spin" type="button"><span class="hamburger-box"><span class="hamburger-inner"></span></span></div></a><div class="sidebar-toggle sidebar-overlay"></div><aside class="sidebar"><script src="/js/sidebar.js"></script><ul class="sidebar-nav"><li class="sidebar-nav-item sidebar-nav-toc hty-icon-button sidebar-nav-active" data-target="post-toc-wrap" title="文章目录"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-list-ordered"></use></svg></li><li class="sidebar-nav-item sidebar-nav-overview hty-icon-button" data-target="site-overview-wrap" title="站点概览"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-passport-line"></use></svg></li></ul><div class="sidebar-panel" id="site-overview-wrap"><div class="site-info fix-top"><a class="site-author-avatar" href="/about/" title="xinzhu"><img width="96" loading="lazy" src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/medias/avatar.png" alt="xinzhu"><span class="site-author-status" title="Looking for dawn.">🌑</span></a><div class="site-author-name"><a href="/about/">xinzhu</a></div><a class="site-name" href="/about/site.html">心竹的小镇</a><sub class="site-subtitle">Nostalgia for a foreign country trip</sub><div class="site-desciption">希望能成为一个有趣的人</div></div><nav class="site-state"><a class="site-state-item hty-icon-button icon-home" href="/" title="首页"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-home-4-line"></use></svg></span></a><div class="site-state-item"><a href="/archives/" title="归档"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-archive-line"></use></svg></span><span class="site-state-item-count">30</span></a></div><div class="site-state-item"><a href="/categories/" title="分类"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-folder-2-line"></use></svg></span><span class="site-state-item-count">10</span></a></div><div class="site-state-item"><a href="/tags/" title="标签"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-price-tag-3-line"></use></svg></span><span class="site-state-item-count">38</span></a></div><a class="site-state-item hty-icon-button" href="/about/#comment" title="留言板"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-clipboard-line"></use></svg></span></a></nav><hr style="margin-bottom:0.5rem"><div class="links-of-author"><a class="links-of-author-item hty-icon-button" rel="noopener" href="/atom.xml" title="RSS" target="_blank" style="color:orange"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-rss-line"></use></svg></a><a class="links-of-author-item hty-icon-button" rel="noopener" href="tencent://AddContact/?fromId=50&amp;fromSubId=1&amp;subcmd=all&amp;uin=1148573442" title="QQ 1148573442" target="_blank" style="color:#12B7F5"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-qq-line"></use></svg></a><a class="links-of-author-item hty-icon-button" rel="noopener" href="https://github.com/xinzhu37" title="GitHub" target="_blank" style="color:#6e5494"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-github-line"></use></svg></a><a class="links-of-author-item hty-icon-button" rel="noopener" href="https://music.163.com/#/my/m/music/playlist?id=2038166981" title="网易云音乐" target="_blank" style="color:#C20C0C"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-netease-cloud-music-line"></use></svg></a><a class="links-of-author-item hty-icon-button" rel="noopener" href="mailto:gfz0307@163.com" title="E-Mail" target="_blank" style="color:#8E71C1"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-mail-line"></use></svg></a></div><hr style="margin:0.5rem 1rem"><div class="links"><a class="links-item hty-icon-button" href="/links/" title="我的小伙伴们" style="color:dodgerblue"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-genderless-line"></use></svg></a></div><br><a class="links-item hty-icon-button" id="toggle-mode-btn" href="javascript:;" title="Mode" style="color: #f1cb64"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-contrast-2-line"></use></svg></a></div><div class="sidebar-panel sidebar-panel-active" id="post-toc-wrap"><div class="post-toc"><div class="post-toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Docker%E5%85%A5%E9%97%A8"><span class="toc-number">1.</span> <span class="toc-text">Docker入门</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0-%E5%AD%A6%E4%B9%A0%E7%9B%AE%E6%A0%87"><span class="toc-number">2.</span> <span class="toc-text">0.学习目标</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E8%AE%A4%E8%AF%86Docker"><span class="toc-number">3.</span> <span class="toc-text">1.认识Docker</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-%E4%BB%80%E4%B9%88%E6%98%AFDocker"><span class="toc-number">3.1.</span> <span class="toc-text">1.1.什么是Docker</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8Docker"><span class="toc-number">3.2.</span> <span class="toc-text">1.2.为什么要用Docker</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-%E7%BB%93%E6%9E%84%E5%92%8C%E6%A6%82%E5%BF%B5"><span class="toc-number">3.3.</span> <span class="toc-text">1.3.结构和概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-1-%E9%95%9C%E5%83%8F%EF%BC%88Image%EF%BC%89"><span class="toc-number">3.3.1.</span> <span class="toc-text">1.3.1.镜像（Image）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-2-%E5%AE%B9%E5%99%A8%EF%BC%88Container%EF%BC%89"><span class="toc-number">3.3.2.</span> <span class="toc-text">1.3.2.容器（Container）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-3-%E4%BB%93%E5%BA%93%EF%BC%88Repository%EF%BC%89"><span class="toc-number">3.3.3.</span> <span class="toc-text">1.3.3.仓库（Repository）</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E5%AE%89%E8%A3%85Docker"><span class="toc-number">4.</span> <span class="toc-text">2.安装Docker</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-CentOS%E5%AE%89%E8%A3%85Docker"><span class="toc-number">4.1.</span> <span class="toc-text">2.1.CentOS安装Docker</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-1-%E5%8D%B8%E8%BD%BD"><span class="toc-number">4.1.1.</span> <span class="toc-text">2.1.1.卸载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-2-%E5%AE%89%E8%A3%85docker"><span class="toc-number">4.1.2.</span> <span class="toc-text">2.1.2.安装docker</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-3-%E9%85%8D%E7%BD%AE%E9%95%9C%E5%83%8F"><span class="toc-number">4.1.3.</span> <span class="toc-text">2.1.3.配置镜像</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-4-docker%E5%91%BD%E4%BB%A4"><span class="toc-number">4.1.4.</span> <span class="toc-text">2.1.4.docker命令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-MacOS%E5%AE%89%E8%A3%85Docker"><span class="toc-number">4.2.</span> <span class="toc-text">2.2.MacOS安装Docker</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-1-%E4%BD%BF%E7%94%A8-Homebrew-%E5%AE%89%E8%A3%85"><span class="toc-number">4.2.1.</span> <span class="toc-text">2.2.1.使用 Homebrew 安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-2-%E6%89%8B%E5%8A%A8%E4%B8%8B%E8%BD%BD%E5%AE%89%E8%A3%85"><span class="toc-number">4.2.2.</span> <span class="toc-text">2.2.2.手动下载安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-3%E8%BF%90%E8%A1%8C"><span class="toc-number">4.2.3.</span> <span class="toc-text">2.2.3运行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-4-%E9%85%8D%E7%BD%AE%E9%95%9C%E5%83%8F%E5%8A%A0%E9%80%9F"><span class="toc-number">4.2.4.</span> <span class="toc-text">2.2.4.配置镜像加速</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E9%95%9C%E5%83%8F%E6%93%8D%E4%BD%9C"><span class="toc-number">5.</span> <span class="toc-text">3.镜像操作</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-%E6%90%9C%E7%B4%A2%E9%95%9C%E5%83%8F"><span class="toc-number">5.1.</span> <span class="toc-text">3.1.搜索镜像</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E6%A1%88%E4%B8%80"><span class="toc-number">5.1.1.</span> <span class="toc-text">方案一</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E6%A1%88%E4%BA%8C"><span class="toc-number">5.1.2.</span> <span class="toc-text">方案二</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-%E8%8E%B7%E5%8F%96%E9%95%9C%E5%83%8F"><span class="toc-number">5.2.</span> <span class="toc-text">3.2.获取镜像</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-%E6%9F%A5%E7%9C%8B%E9%95%9C%E5%83%8F"><span class="toc-number">5.3.</span> <span class="toc-text">3.3.查看镜像</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4-%E5%88%A0%E9%99%A4%E9%95%9C%E5%83%8F"><span class="toc-number">5.4.</span> <span class="toc-text">3.4.删除镜像</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E5%AE%B9%E5%99%A8%E6%93%8D%E4%BD%9C"><span class="toc-number">6.</span> <span class="toc-text">4.容器操作</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-%E5%88%9B%E5%BB%BA%E5%B9%B6%E8%BF%90%E8%A1%8C%E5%AE%B9%E5%99%A8"><span class="toc-number">6.1.</span> <span class="toc-text">4.1.创建并运行容器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-%E6%9F%A5%E7%9C%8B%E5%AE%B9%E5%99%A8%E7%8A%B6%E6%80%81"><span class="toc-number">6.2.</span> <span class="toc-text">4.2.查看容器状态</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-%E8%BF%9B%E5%85%A5%E5%AE%B9%E5%99%A8"><span class="toc-number">6.3.</span> <span class="toc-text">4.3.进入容器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-%E5%90%AF%E5%8A%A8%E5%92%8C%E5%81%9C%E6%AD%A2%E5%AE%B9%E5%99%A8"><span class="toc-number">6.4.</span> <span class="toc-text">4.4.启动和停止容器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-5-%E6%9F%A5%E7%9C%8B%E8%BF%90%E8%A1%8C%E6%97%A5%E5%BF%97"><span class="toc-number">6.5.</span> <span class="toc-text">4.5.查看运行日志</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-6-%E5%88%A0%E9%99%A4%E5%AE%B9%E5%99%A8"><span class="toc-number">6.6.</span> <span class="toc-text">4.6.删除容器</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-%E6%95%B0%E6%8D%AE%E5%8D%B7%E7%AE%A1%E7%90%86"><span class="toc-number">7.</span> <span class="toc-text">6.数据卷管理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#6-1-%E6%95%B0%E6%8D%AE%E5%8D%B7"><span class="toc-number">7.1.</span> <span class="toc-text">6.1.数据卷</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-2-%E6%8C%82%E8%BD%BD%E6%95%B0%E6%8D%AE%E5%8D%B7"><span class="toc-number">7.2.</span> <span class="toc-text">6.2.挂载数据卷</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-3-%E6%8C%82%E8%BD%BD%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E6%88%96%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="toc-number">7.3.</span> <span class="toc-text">6.3.挂载本地文件或文件夹</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-%E7%BD%91%E7%BB%9C%E7%AE%A1%E7%90%86"><span class="toc-number">8.</span> <span class="toc-text">7.网络管理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#7-1-%E5%88%9B%E5%BB%BAnetwork"><span class="toc-number">8.1.</span> <span class="toc-text">7.1.创建network</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-2-%E6%9F%A5%E7%9C%8Bnetwork"><span class="toc-number">8.2.</span> <span class="toc-text">7.2.查看network</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-3-%E8%BF%9E%E6%8E%A5network"><span class="toc-number">8.3.</span> <span class="toc-text">7.3.连接network</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#8-DockerFile"><span class="toc-number">9.</span> <span class="toc-text">8.DockerFile</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#8-1-%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8"><span class="toc-number">9.1.</span> <span class="toc-text">8.1.快速入门</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-2-%E8%AF%A6%E7%BB%86%E8%AF%AD%E6%B3%95%E4%BB%8B%E7%BB%8D"><span class="toc-number">9.2.</span> <span class="toc-text">8.2.详细语法介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%EF%BC%89FROM"><span class="toc-number">9.2.1.</span> <span class="toc-text">1）FROM</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%EF%BC%89COPY"><span class="toc-number">9.2.2.</span> <span class="toc-text">2）COPY</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%EF%BC%89RUN"><span class="toc-number">9.2.3.</span> <span class="toc-text">3）RUN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%EF%BC%89ENV"><span class="toc-number">9.2.4.</span> <span class="toc-text">4）ENV</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5%EF%BC%89Volume"><span class="toc-number">9.2.5.</span> <span class="toc-text">5）Volume</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6%EF%BC%89CMD"><span class="toc-number">9.2.6.</span> <span class="toc-text">6）CMD</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7%EF%BC%89ENTRYPOINT"><span class="toc-number">9.2.7.</span> <span class="toc-text">7）ENTRYPOINT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8%EF%BC%89EXPOSE"><span class="toc-number">9.2.8.</span> <span class="toc-text">8）EXPOSE</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-3-%E4%BB%8E0%E6%9E%84%E5%BB%BANginx%E9%95%9C%E5%83%8F"><span class="toc-number">9.3.</span> <span class="toc-text">8.3.从0构建Nginx镜像</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#9-%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE"><span class="toc-number">10.</span> <span class="toc-text">9.部署项目</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#9-2-%E5%AE%89%E8%A3%85MySQL"><span class="toc-number">10.1.</span> <span class="toc-text">9.2.安装MySQL</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-1-%E5%87%86%E5%A4%87%E9%95%9C%E5%83%8F"><span class="toc-number">10.1.1.</span> <span class="toc-text">9.2.1.准备镜像</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-2-%E6%8C%82%E8%BD%BD%E6%9C%AC%E5%9C%B0%E7%9B%AE%E5%BD%95"><span class="toc-number">10.1.2.</span> <span class="toc-text">9.2.2.挂载本地目录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-3-%E8%BF%90%E8%A1%8Cmysql%E5%AE%B9%E5%99%A8"><span class="toc-number">10.1.3.</span> <span class="toc-text">9.2.3.运行mysql容器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-4-%E4%BF%AE%E6%94%B9%E9%85%8D%E7%BD%AE"><span class="toc-number">10.1.4.</span> <span class="toc-text">9.2.4.修改配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-5-%E6%B5%8B%E8%AF%95%E8%BF%9E%E6%8E%A5"><span class="toc-number">10.1.5.</span> <span class="toc-text">9.2.5.测试连接</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-3-%E5%AE%89%E8%A3%85Redis"><span class="toc-number">10.2.</span> <span class="toc-text">9.3.安装Redis</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-3-1-%E5%AF%BC%E5%85%A5%E9%95%9C%E5%83%8F"><span class="toc-number">10.2.1.</span> <span class="toc-text">9.3.1.导入镜像</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-3-2-%E6%8C%82%E8%BD%BD%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6"><span class="toc-number">10.2.2.</span> <span class="toc-text">9.3.2.挂载本地文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-3-3-%E8%BF%90%E8%A1%8C%E5%AE%B9%E5%99%A8"><span class="toc-number">10.2.3.</span> <span class="toc-text">9.3.3.运行容器</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-4-%E5%AE%89%E8%A3%85RabbitMQ"><span class="toc-number">10.3.</span> <span class="toc-text">9.4.安装RabbitMQ</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-4-1-%E5%87%86%E5%A4%87%E9%95%9C%E5%83%8F"><span class="toc-number">10.3.1.</span> <span class="toc-text">9.4.1.准备镜像</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-4-2-%E8%BF%90%E8%A1%8C%E5%AE%B9%E5%99%A8"><span class="toc-number">10.3.2.</span> <span class="toc-text">9.4.2.运行容器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-4-3-%E6%B5%8B%E8%AF%95%E8%BF%9E%E6%8E%A5"><span class="toc-number">10.3.3.</span> <span class="toc-text">9.4.3.测试连接</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-5-%E5%AE%89%E8%A3%85Elasticsearch"><span class="toc-number">10.4.</span> <span class="toc-text">9.5.安装Elasticsearch</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-5-1-%E5%87%86%E5%A4%87%E9%95%9C%E5%83%8F"><span class="toc-number">10.4.1.</span> <span class="toc-text">9.5.1.准备镜像</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-5-2-%E5%87%86%E5%A4%87%E6%95%B0%E6%8D%AE%E5%8D%B7"><span class="toc-number">10.4.2.</span> <span class="toc-text">9.5.2.准备数据卷</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-5-3-%E8%BF%90%E8%A1%8C%E5%AE%B9%E5%99%A8"><span class="toc-number">10.4.3.</span> <span class="toc-text">9.5.3.运行容器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-5-4-%E6%B5%8B%E8%AF%95"><span class="toc-number">10.4.4.</span> <span class="toc-text">9.5.4.测试</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#10-%E6%80%BB%E7%BB%93"><span class="toc-number">11.</span> <span class="toc-text">10.总结</span></a></li></ol></div></div></div></aside><main class="sidebar-translate" id="content"><div id="post"><article class="hty-card post-block" itemscope itemtype="https://schema.org/Article"><link itemprop="mainEntityOfPage" href="https://xinzhu37.github.io/note/skill/docker%E5%85%A5%E9%97%A8/"><span hidden itemprop="author" itemscope itemtype="https://schema.org/Person"><meta itemprop="name" content="xinzhu"><meta itemprop="description"></span><span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization"><meta itemprop="name" content="心竹的小镇"></span><header class="post-header"><h1 class="post-title" itemprop="name headline">Docker入门<a class="post-edit-link" href="null_posts/note/skill/docker入门.md" target="_blank" title="编辑" rel="noopener"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-edit-line"></use></svg></a></h1><div class="post-meta"><div class="post-time" style="display:inline-block"><span class="post-meta-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-calendar-line"></use></svg></span> <time title="创建时间：2021-06-25 14:06:00" itemprop="dateCreated datePublished" datetime="2021-06-25T14:06:00+08:00">2021-06-25</time></div><div class="post-classify"><span class="post-category"> <span class="post-meta-item-icon" style="margin-right:3px;"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-folder-line"></use></svg></span><span itemprop="about" itemscope itemtype="https://schema.org/Thing"><a class="category-item" href="/categories/%E6%8A%80%E6%9C%AF/" style="--text-color:var(--hty-text-color)" itemprop="url" rel="index"><span itemprop="text">技术</span></a></span></span><span class="post-tag"><span class="post-meta-divider">-</span><a class="tag-item" href="/tags/%E5%88%86%E4%BA%AB/" style="--text-color:#0078e7"><span class="post-meta-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-price-tag-3-line"></use></svg></span><span class="tag-name">分享</span></a><a class="tag-item" href="/tags/%E7%AC%94%E8%AE%B0/" style="--text-color:dimgray"><span class="post-meta-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-price-tag-3-line"></use></svg></span><span class="tag-name">笔记</span></a><a class="tag-item" href="/tags/Docker/" style="--text-color:var(--hty-text-color)"><span class="post-meta-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-price-tag-3-line"></use></svg></span><span class="tag-name">Docker</span></a></span></div></div></header><section class="post-body" itemprop="articleBody"><div class="post-content markdown-body" style="--smc-primary:#0078E7;"><h1 id="Docker入门"><a href="#Docker入门" class="headerlink" title="Docker入门"></a>Docker入门</h1><h1 id="0-学习目标"><a href="#0-学习目标" class="headerlink" title="0.学习目标"></a>0.学习目标</h1><ul>
+<li>了解docker和虚拟机的区别</li>
+<li>会操作Docker拉取镜像运行容器</li>
+<li>会编写Dockerfile</li>
+<li>会用Docker部署常见应用</li>
+</ul>
+<h1 id="1-认识Docker"><a href="#1-认识Docker" class="headerlink" title="1.认识Docker"></a>1.认识Docker</h1><p>本节会带着大家了解Docker，以及Docker中的一些基本概念。</p>
+<h2 id="1-1-什么是Docker"><a href="#1-1-什么是Docker" class="headerlink" title="1.1.什么是Docker"></a>1.1.什么是Docker</h2><p>Docker 最初是 dotCloud 公司创始人 Solomon Hykes 在法国期间发起的一个公司内部项目，它是基于 dotCloud 公司多年云服务技术的一次革新，并于 2013 年 3 月以 Apache 2.0 授权协议开源，主要项目代码在 GitHub 上进行维护。Docker 项目后来还加入了 Linux 基金会，并成立推动 开放容器联盟（OCI）。</p>
+<p>Docker 自开源后受到广泛的关注和讨论，至今其 GitHub 项目 已经超过 5 万 4 千个星标和一万多个 fork。甚至由于 Docker 项目的火爆，在 2013 年底，dotCloud 公司决定改名为 Docker。Docker 最初是在 Ubuntu 12.04 上开发实现的；Red Hat 则从 RHEL 6.5 开始对 Docker 进行支持；Google 也在其 PaaS 产品中广泛应用 Docker。</p>
+<p>Docker 使用 Google 公司推出的 Go 语言 进行开发实现，基于 Linux 内核的 cgroup，namespace，以及 OverlayFS 类的 Union FS 等技术，对进程进行封装隔离，属于 操作系统层面的虚拟化技术。由于隔离的进程独立于宿主和其它的隔离的进程，因此也称其为容器。最初实现是基于 LXC，从 0.7 版本以后开始去除 LXC，转而使用自行开发的 libcontainer，从 1.11 开始，则进一步演进为使用 runC 和 containerd。</p>
+<p><strong>Docker</strong> 在容器的基础上，进行了进一步的封装，从文件系统、网络互联到进程隔离等等，极大的简化了容器的创建和维护。使得 <code>Docker</code> 技术比虚拟机技术更为轻便、快捷。</p>
+<p>下面的图片比较了 <strong>Docker</strong> 和传统虚拟化方式的不同之处:</p>
+<ul>
+<li><strong>虚拟机</strong>: 虚拟机是虚拟出一套硬件后，在其上运行一个<strong>完整操作系统</strong>，在该系统上再运行所需应用进程；</li>
+</ul>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/1542112444492.png" alt="image-20200707173614728" loading="lazy"> </p>
+<ul>
+<li><strong>Docker</strong>：Docker没有虚拟的硬件，也没有模拟操作系统，而是直接运行在宿主机上。Docker会为每个应用进程形成隔离环境，让的应用进程以为自己是独立机器。因此Docker要比传统虚拟机更为轻便。</li>
+</ul>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707173629578.png" alt="image-20200707173629578" loading="lazy"> </p>
+<h2 id="1-2-为什么要用Docker"><a href="#1-2-为什么要用Docker" class="headerlink" title="1.2.为什么要用Docker"></a>1.2.为什么要用Docker</h2><p>作为一种新兴的虚拟化方式，<code>Docker</code> 跟传统的虚拟化方式相比具有众多的优势：</p>
+<ul>
+<li>更高效的利用系统资源</li>
+<li>更快速的启动时间</li>
+<li>一致的运行环境</li>
+<li>持续的交付和部署</li>
+<li>更轻松的迁移</li>
+</ul>
+<p>对比传统虚拟机：</p>
+<table>
+<thead>
+<tr>
+<th align="left">特性</th>
+<th align="left">容器</th>
+<th align="left">虚拟机</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">启动</td>
+<td align="left">秒级</td>
+<td align="left">分钟级</td>
+</tr>
+<tr>
+<td align="left">硬盘使用</td>
+<td align="left">一般为 <code>MB</code></td>
+<td align="left">一般为 <code>GB</code></td>
+</tr>
+<tr>
+<td align="left">性能</td>
+<td align="left">接近原生</td>
+<td align="left">弱于</td>
+</tr>
+<tr>
+<td align="left">系统支持量</td>
+<td align="left">单机支持上千个容器</td>
+<td align="left">一般几十个</td>
+</tr>
+</tbody></table>
+<h2 id="1-3-结构和概念"><a href="#1-3-结构和概念" class="headerlink" title="1.3.结构和概念"></a>1.3.结构和概念</h2><p>Docker是一个客户端-服务器（C/S）架构程序。Docker客户端（client）只需要向Docker服务器或者后台进程发出请求，服务器或者后台进程将完成所有工作并返回结果。</p>
+<p>Docker中有三个很重要的概念：</p>
+<ul>
+<li>镜像（<code>Image</code>）</li>
+<li>容器（<code>Container</code>）</li>
+<li>仓库（<code>Repository</code>）</li>
+</ul>
+<p>理解了这三个概念，就理解了 Docker 的整个生命周期。</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200701203056621.png" alt="image-20200701203056621" loading="lazy"></p>
+<h3 id="1-3-1-镜像（Image）"><a href="#1-3-1-镜像（Image）" class="headerlink" title="1.3.1.镜像（Image）"></a>1.3.1.镜像（<code>Image</code>）</h3><p>Linux的操作系统分为内核和用户空间。对于 Linux 而言，内核启动后，会挂载 <code>root</code> 文件系统为其提供用户空间支持。</p>
+<p>而 Docker 镜像（Image），就相当于是一个 <code>root</code> 文件系统。比如官方镜像 <code>ubuntu:18.04</code> 就包含了完整的一套 Ubuntu 18.04 最小系统的 <code>root</code> 文件系统。</p>
+<p>Docker 镜像是一个特殊的文件系统，除了提供容器运行时所需的程序、库、资源、配置等文件外，还包含了一些为运行时准备的一些配置参数（如匿名卷、环境变量、用户等）。镜像不包含任何动态数据，其内容在构建之后也不会被改变，是一个**<code>只读的模板</code>**。</p>
+<p>简单来说：镜像就像你下载并安装好的一个游戏，比如《我的世界》，其中包含了运行所需要的jre库。因此这个游戏可以放到任何机器上运行。</p>
+<h3 id="1-3-2-容器（Container）"><a href="#1-3-2-容器（Container）" class="headerlink" title="1.3.2.容器（Container）"></a>1.3.2.容器（<code>Container</code>）</h3><p>镜像（<code>Image</code>）和容器（<code>Container</code>）的关系，就像是面向对象程序设计中的 <code>类</code> 和 <code>实例</code> 一样，镜像是静态的定义，容器是镜像运行时的实体。容器可以被创建、启动、停止、删除、暂停等。</p>
+<p>容器的实质是进程，但与直接在宿主执行的进程不同，Docker会保证<strong>隔离每一个容器进程</strong>。</p>
+<p>容器进程运行于属于自己的独立的 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Linux_namespaces">命名空间</a>。因此容器可以拥有自己的 <code>root</code> 文件系统、自己的网络配置、自己的进程空间，甚至自己的用户 ID 空间。容器内的进程是运行在一个隔离的环境里，使用起来，就好像是在一个独立于宿主的系统下操作一样。这种特性使得容器封装的应用比直接在宿主运行更加安全。也因为这种隔离的特性，很多人初学 Docker 时常常会混淆容器和虚拟机。</p>
+<h3 id="1-3-3-仓库（Repository）"><a href="#1-3-3-仓库（Repository）" class="headerlink" title="1.3.3.仓库（Repository）"></a>1.3.3.仓库（<code>Repository</code>）</h3><p>镜像构建完成后，可以很容易的在当前宿主机上运行，但是，如果需要在其它服务器上使用这个镜像，我们就需要一个集中的存储、分发镜像的服务，<a target="_blank" rel="noopener" href="https://docker_practice.gitee.io/zh-cn/repository/registry.html">Docker Registry</a> 就是这样的服务。</p>
+<p>一个 <strong>Docker Registry</strong> 中可以包含多个 <strong>仓库</strong>（<code>Repository</code>）；每个仓库可以包含多个 <strong>标签</strong>（<code>Tag</code>）；每个标签对应一个版本的镜像。</p>
+<p>通常，一个仓库（<code>Repository</code>）会包含同一个软件不同版本的镜像(<code>image</code>)，而标签（<code>Tag</code>）就常用于对应该软件的各个版本。我们可以通过 <code>&lt;仓库名&gt;:&lt;标签&gt;</code> 的格式来指定具体是这个软件哪个版本的镜像。如果不给出标签，将以 <code>latest</code> 作为默认标签。</p>
+<p>以Nginx镜像为例。我们可以通过 <code>nginx:7.9</code>，或者 <code>nginx:8.0</code> 来具体指定所需哪个版本的镜像。如果忽略了标签，比如 <code>nginx</code>，那将视为 <code>nginx:latest</code>。</p>
+<p>仓库名经常以 <em>两段式路径</em> 形式出现，比如 <code>jwilder/nginx-proxy</code>，前者往往意味着 Docker Registry 多用户环境下的用户名，后者则往往是对应的软件名。</p>
+<p>仓库分为<strong>公开仓库</strong>（Public）和<strong>私有仓库</strong>（Private）两种形式。</p>
+<p>最常使用的 Registry 公开服务是官方的 <a target="_blank" rel="noopener" href="https://hub.docker.com/">Docker Hub</a>，这也是默认的 Registry，并拥有大量的高质量的官方镜像，供用户下载。国内也有一些云服务商提供类似于 Docker Hub 的公开服务。比如 <a target="_blank" rel="noopener" href="https://c.163.com/hub#/m/library/">网易云镜像服务</a>、<a target="_blank" rel="noopener" href="https://hub.daocloud.io/">DaoCloud 镜像市场</a>、<a target="_blank" rel="noopener" href="https://cr.console.aliyun.com/">阿里云镜像库</a> 等。</p>
+<p>除了使用公开服务外，用户还可以在本地搭建私有 Docker Registry。</p>
+<p>当用户创建了自己的镜像之后就可以使用 push 命令将它上传到公有或者私有仓库，这样下次在另外一台机器上使用这个镜像时候，只需要从仓库上 pull 下来就可以了。</p>
+<h1 id="2-安装Docker"><a href="#2-安装Docker" class="headerlink" title="2.安装Docker"></a>2.安装Docker</h1><p>Docker 分为 CE 和 EE 两大版本。CE 即社区版（免费，支持周期 7 个月），EE 即企业版，强调安全，付费使用，支持周期 24 个月。</p>
+<p>Docker CE 分为 <code>stable</code> <code>test</code> 和 <code>nightly</code> 三个更新频道。</p>
+<p>官方网站上有各种环境下的 <a target="_blank" rel="noopener" href="https://docs.docker.com/install/">安装指南</a>，这里主要介绍 Docker CE 在 <code>Linux</code> 和 <code>macOS</code> 上的安装。</p>
+<h2 id="2-1-CentOS安装Docker"><a href="#2-1-CentOS安装Docker" class="headerlink" title="2.1.CentOS安装Docker"></a>2.1.CentOS安装Docker</h2><p>Docker CE 支持 64 位版本 CentOS 7，并且要求内核版本不低于 3.10， CentOS 7 满足最低内核的要求，所以我们在CentOS 7安装Docker。</p>
+<h3 id="2-1-1-卸载"><a href="#2-1-1-卸载" class="headerlink" title="2.1.1.卸载"></a>2.1.1.卸载</h3><p>如果之前安装过旧版本的Docker，可以使用下面命令卸载：</p>
+<pre class="language-none"><code class="language-none">yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-selinux \
+                  docker-engine-selinux \
+                  docker-engine \
+                  docker-ce</code></pre>
+
+
+
+<h3 id="2-1-2-安装docker"><a href="#2-1-2-安装docker" class="headerlink" title="2.1.2.安装docker"></a>2.1.2.安装docker</h3><p>首先需要大家虚拟机联网，安装yum工具</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh">yum install -y yum-utils \
+           device-mapper-persistent-data \
+           lvm2 --skip-broken</code></pre>
+
+<p>更新XFS文件系统管理工具：</p>
+<pre class="language-shell" data-language="shell"><code class="language-shell">yum update xfsprogs -y</code></pre>
+
+
+
+<p>然后更新本地镜像源：</p>
+<pre class="language-shell" data-language="shell"><code class="language-shell">yum-config-manager <span class="token punctuation">\</span>
+    --add-repo <span class="token punctuation">\</span>
+    https://mirrors.ustc.edu.cn/docker-ce/linux/centos/docker-ce.repo
+<span class="token comment"># 解决域名问题</span>
+<span class="token function">sed</span> -i <span class="token string">'s/download.docker.com/mirrors.ustc.edu.cn\/docker-ce/g'</span> /etc/yum.repos.d/docker-ce.repo</code></pre>
+
+
+
+<p>更新镜像源缓存：</p>
+<pre class="language-none"><code class="language-none">yum makecache fast</code></pre>
+
+
+
+<p>然后输入命令：</p>
+<pre class="language-shell" data-language="shell"><code class="language-shell">yum <span class="token function">install</span> -y docker-ce</code></pre>
+
+<p>docker-ce为社区免费版本。稍等片刻，docker即可安装成功。</p>
+<p>一定要关闭防火墙后，再启动docker</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh"># 关闭
+systemctl stop firewalld
+# 禁止开机启动防火墙
+systemctl disable firewalld</code></pre>
+
+
+
+<p>通过命令启动docker：</p>
+<pre class="language-none"><code class="language-none">systemctl start docker</code></pre>
+
+
+
+<p>然后输入命令，可以查看docker版本：</p>
+<pre class="language-none"><code class="language-none">docker --version</code></pre>
+
+<p>如图：</p>
+<p><img src="assets/image-20200713163342273.png" alt="image-20200713163342273" loading="lazy"> </p>
+<h3 id="2-1-3-配置镜像"><a href="#2-1-3-配置镜像" class="headerlink" title="2.1.3.配置镜像"></a>2.1.3.配置镜像</h3><p>docker官方镜像仓库网速较差，我们需要设置国内镜像：</p>
+<p>参考阿里云的镜像加速文档：<a target="_blank" rel="noopener" href="https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors">https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors</a></p>
+<h3 id="2-1-4-docker命令"><a href="#2-1-4-docker命令" class="headerlink" title="2.1.4.docker命令"></a>2.1.4.docker命令</h3><p>docker服务的命令：</p>
+<pre class="language-none"><code class="language-none">systemctl start docker  # 启动docker服务
+systemctl stop docker  # 停止docker服务
+systemctl restart docker  # 重启docker服务</code></pre>
+
+
+
+<h2 id="2-2-MacOS安装Docker"><a href="#2-2-MacOS安装Docker" class="headerlink" title="2.2.MacOS安装Docker"></a>2.2.MacOS安装Docker</h2><p>macOS下支持两种安装方式：</p>
+<ul>
+<li>Homebrew安装</li>
+<li>手动下载安装</li>
+</ul>
+<p>大家根据自己情况选择。</p>
+<h3 id="2-2-1-使用-Homebrew-安装"><a href="#2-2-1-使用-Homebrew-安装" class="headerlink" title="2.2.1.使用 Homebrew 安装"></a>2.2.1.使用 Homebrew 安装</h3><p><a target="_blank" rel="noopener" href="https://brew.sh/">Homebrew</a> 的 <a target="_blank" rel="noopener" href="https://github.com/Homebrew/homebrew-cask">Cask</a> 已经支持 Docker Desktop for Mac，因此可以很方便的使用 Homebrew Cask 来进行安装：</p>
+<pre class="language-bash" data-language="bash"><code class="language-bash">$ brew cask <span class="token function">install</span> docker</code></pre>
+
+<h3 id="2-2-2-手动下载安装"><a href="#2-2-2-手动下载安装" class="headerlink" title="2.2.2.手动下载安装"></a>2.2.2.手动下载安装</h3><p>如果需要手动下载，请点击以下链接下载 <a target="_blank" rel="noopener" href="https://download.docker.com/mac/stable/Docker.dmg">Stable</a> 或 <a target="_blank" rel="noopener" href="https://download.docker.com/mac/edge/Docker.dmg">Edge</a> 版本的 Docker Desktop for Mac。</p>
+<p>如同 macOS 其它软件一样，安装也非常简单，双击下载的 <code>.dmg</code> 文件，然后将那只叫 <a target="_blank" rel="noopener" href="https://www.docker.com/blog/call-me-moby-dock/">Moby</a> 的鲸鱼图标拖拽到 <code>Application</code> 文件夹即可（其间需要输入用户密码）。</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/install-mac-dmg.png" alt="img" loading="lazy"></p>
+<h3 id="2-2-3运行"><a href="#2-2-3运行" class="headerlink" title="2.2.3运行"></a>2.2.3运行</h3><p>从应用中找到 Docker 图标并点击运行。</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/install-mac-apps.png" alt="img" loading="lazy"></p>
+<p>运行之后，会在右上角菜单栏看到多了一个鲸鱼图标，这个图标表明了 Docker 的运行状态。</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/install-mac-menubar.png" alt="img" loading="lazy"></p>
+<p>第一次点击图标，可能会看到这个安装成功的界面，点击 “Got it!” 可以关闭这个窗口。</p>
+<h3 id="2-2-4-配置镜像加速"><a href="#2-2-4-配置镜像加速" class="headerlink" title="2.2.4.配置镜像加速"></a>2.2.4.配置镜像加速</h3><p>对于使用 macOS 的用户，在任务栏点击 Docker Desktop 应用图标 -&gt; <code>Perferences</code>，在弹出窗口的顶部导航菜单选择 <code>Daemon</code>，在下边的<code>Registry mirrors</code>框中，填写镜像地址即可，例如网易镜像：</p>
+<pre class="language-json" data-language="json"><code class="language-json">https<span class="token operator">:</span><span class="token comment">//hub-mirror.c.163.com</span></code></pre>
+
+<p>修改完成之后，点击 <code>Apply &amp; Restart</code> 按钮，Docker 就会重启并应用配置的镜像地址了。</p>
+<h1 id="3-镜像操作"><a href="#3-镜像操作" class="headerlink" title="3.镜像操作"></a>3.镜像操作</h1><p>当运行容器时，使用的镜像如果在本地中不存在，docker 就会自动从 docker 镜像仓库中下载，<a target="_blank" rel="noopener" href="https://hub.docker.com/search?q=&type=image">Docker Hub</a> 上有大量的高质量的镜像可以用，这里我们就说一下怎么获取这些镜像。</p>
+<h2 id="3-1-搜索镜像"><a href="#3-1-搜索镜像" class="headerlink" title="3.1.搜索镜像"></a>3.1.搜索镜像</h2><p>要使用一个镜像，必须先知道镜像的仓库名称、版本等信息。那么问题来了，我们该如何知道镜像的名称呢？</p>
+<h3 id="方案一"><a href="#方案一" class="headerlink" title="方案一"></a>方案一</h3><p>去<a target="_blank" rel="noopener" href="https://hub.docker.com/">Docker Hub</a>上搜索，如图：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200706170650377.png" alt="image-20200706170650377" loading="lazy"></p>
+<p>点击搜索到的第一个结果（一般是官方镜像），即可看到nginx的官方镜像及使用说明：<a target="_blank" rel="noopener" href="https://hub.docker.com/_/nginx">https://hub.docker.com/_/nginx</a></p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200706171154976.png" alt="image-20200706171154976" loading="lazy"> </p>
+<p>点击tags，可以看到各种nginx的版本：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200706171550370.png" alt="image-20200706171550370" loading="lazy"></p>
+<p>还能看到对应的拉取命令：<code>docker pull nginx:latest</code></p>
+<h3 id="方案二"><a href="#方案二" class="headerlink" title="方案二"></a>方案二</h3><p>使用<code>docker search 镜像关键字</code> 命令搜索：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200706170952725.png" alt="image-20200706170952725" loading="lazy"></p>
+<p>可以看到各种nginx，其中第一个就是官方的nginx镜像，不过这里看不到tag信息。</p>
+<h2 id="3-2-获取镜像"><a href="#3-2-获取镜像" class="headerlink" title="3.2.获取镜像"></a>3.2.获取镜像</h2><p>从 Docker 镜像仓库获取镜像的命令是 <code>docker pull</code>。其命令格式为：</p>
+<pre class="language-none"><code class="language-none">docker pull [OPTIONS] NAME[:TAG|@DIGEST]</code></pre>
+
+<ul>
+<li><p><code>OPTIONS</code>：选项，</p>
+<ul>
+<li><code>-a</code>：代表拉取所有版本镜像</li>
+<li><code>--help</code>：帮助</li>
+</ul>
+</li>
+<li><p>NAME：仓库名称</p>
+</li>
+<li><p>TAG：仓库标签，也就是具体的版本，如果不指定一般就是latest，最新版本</p>
+</li>
+</ul>
+<p>我们以nginx为例来试试：</p>
+<pre class="language-none"><code class="language-none">docker pull nginx</code></pre>
+
+<p>如图：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200706171801818.png" alt="image-20200706171801818" loading="lazy"></p>
+<p>因为我们没有指定tag，所以使用了默认的tag：latest</p>
+<p>然后就可以看到开始下载以及下载的进度了。</p>
+<h2 id="3-3-查看镜像"><a href="#3-3-查看镜像" class="headerlink" title="3.3.查看镜像"></a>3.3.查看镜像</h2><p>查看本地镜像的命令是：<code>docker images</code>，基本语法：</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh">docker images [OPTIONS] [REPOSITORY[:TAG]]</code></pre>
+
+<p>参数说明：</p>
+<ul>
+<li><p>OPTIONS：可选性</p>
+<ul>
+<li><code>-a</code>：列出所有镜像</li>
+<li><code>-f</code>：过滤要显示的镜像</li>
+<li><code>-q</code>：只显示镜像的ID</li>
+</ul>
+</li>
+<li><p>REPOSITORY：仓库名，只显示指定仓库名的镜像</p>
+</li>
+</ul>
+<p>示例，显示所有镜像：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200706173524175.png" alt="image-20200706173524175" loading="lazy"></p>
+<p>显示的字段包括：</p>
+<ul>
+<li>REPOSITORY：仓库名称</li>
+<li>TAG：标记，也就是版本号</li>
+<li>IMAGE ID：镜像的ID，是镜像的唯一标示</li>
+<li>CREATED：创建时间</li>
+<li>SIZE：镜像大小</li>
+</ul>
+<p>只显示镜像ID：</p>
+<pre class="language-none"><code class="language-none">[root@localhost ~]# docker images -q
+95bc78c8d15d
+2622e6cca7eb
+4cdbec704e47
+a0e2e64ac939
+175436221fe5
+b1179d41a7b4
+2554c1ef3425
+dbf758a9f11b
+98455b9624a9</code></pre>
+
+
+
+
+
+<h2 id="3-4-删除镜像"><a href="#3-4-删除镜像" class="headerlink" title="3.4.删除镜像"></a>3.4.删除镜像</h2><p>删除镜像的命令为：<code>docker rmi</code>，语法：</p>
+<pre class="language-none"><code class="language-none">docker rmi [OPTIONS] IMAGE [IMAGE...]</code></pre>
+
+<p>参数说明：</p>
+<ul>
+<li>OPTIONS：选项<ul>
+<li><code>-f</code>：强制删除，不管是否有容器基于该镜像运行</li>
+</ul>
+</li>
+<li>IMAGE：镜像名称或镜像ID</li>
+</ul>
+<p>示例：</p>
+<pre class="language-none"><code class="language-none">[root@localhost ~]# docker rmi docker.io&#x2F;nginx
+Untagged: docker.io&#x2F;nginx:latest
+Untagged: docker.io&#x2F;nginx@sha256:21f32f6c08406306d822a0e6e8b7dc81f53f336570e852e25fbe1e3e3d0d0133
+Deleted: sha256:2622e6cca7ebbb6e310743abce3fc47335393e79171b9d76ba9d4f446ce7b163
+Deleted: sha256:e86d1b8b130bec203609b4b1d7b851bd763fa16e513e5a3fa6102ebea23260e0
+Deleted: sha256:8f9f007533543813bb1aef80b791a16e5e16c7cbbbc456a3a483d0fa7a9effcc
+Deleted: sha256:e2c0065a77fee75795cdcf9f19a72f11769332423cd52ec9e19aacfb878aec8b
+Deleted: sha256:059442698ef65fe8545e4fe9657988a10329b9c3663b368ae7ee0007a9c43949
+Deleted: sha256:13cb14c2acd34e45446a50af25cb05095a17624678dbafbcc9e26086547c1d74
+</code></pre>
+
+
+
+
+
+<h1 id="4-容器操作"><a href="#4-容器操作" class="headerlink" title="4.容器操作"></a>4.容器操作</h1><p>镜像是一个独立的文件系统，有了镜像以后，我们就可以基于镜像运行多个容器。每个容器都会有自己运行环境。</p>
+<p>我们接下来学习如何管理一个容器，包括创建、启动和停止等。</p>
+<h2 id="4-1-创建并运行容器"><a href="#4-1-创建并运行容器" class="headerlink" title="4.1.创建并运行容器"></a>4.1.创建并运行容器</h2><p>拉取到镜像后，我们需要基于镜像创建一个容器，然后运行它。一般我们会把创建和运行合为一个命令：<code>docker run</code>命令，通过<code>docker run --help</code>可以查看语法。</p>
+<p>具体语法：</p>
+<pre class="language-none"><code class="language-none">Usage:  docker run [OPTIONS] IMAGE [COMMAND] [ARG...]</code></pre>
+
+<p>语法说明：</p>
+<ul>
+<li>OPTIONS：可选项，这里列举一些常用的<ul>
+<li><code>-e</code>：环境变量，例如指定运行MySQL的默认密码，一般是KEY=VALUE的结构</li>
+<li><code>-d</code>：守护进程，让容器作为后台进程运行</li>
+<li><code>-h</code>：主机名，指定容器运行的hostname</li>
+<li><code>-p</code>：端口映射，例如：<code>-p 8080:80</code>，把容器的80端口映射到宿主机的8080端口</li>
+<li><code>-v</code>：挂载的数据卷。例如：<code>-v /tmp:/var/tmp</code>，把宿主机的/tmp目录挂载到容器的/var/tmp目录</li>
+<li><code>--name</code>：给容器起一个名字</li>
+<li><code>--network</code>：设置容器的网络配置</li>
+</ul>
+</li>
+<li>IMAGE：镜像名称</li>
+<li>COMMAND：运行的指令，如果没指定则使用镜像默认的COMMAND</li>
+<li>ARG：COMMAND参数</li>
+</ul>
+<p>我们来运行一个Nginx的容器：</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh">docker run --name my-nginx -p 80:80 -d nginx</code></pre>
+
+<p>运行命令后，会在控制台返回一个容器的id：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707090831324.png" alt="image-20200707090831324" loading="lazy"></p>
+<p>此时，我们在浏览器访问虚拟机的地址：<a href="http://192.168.150.101（用你自己的虚拟机地址）：">http://192.168.150.101（用你自己的虚拟机地址）：</a></p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707104639057.png" alt="image-20200707104639057" loading="lazy"></p>
+<h2 id="4-2-查看容器状态"><a href="#4-2-查看容器状态" class="headerlink" title="4.2.查看容器状态"></a>4.2.查看容器状态</h2><p>如果要查看当前运行的容器，可以使用<code>docker ps</code>命令：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707105300276.png" alt="image-20200707105300276" loading="lazy"></p>
+<p>可以发现其<code>STATUS</code>为：<code>Up 11 seconds</code>，正在运行。</p>
+<p>如果要查看已经停止运行的容器，可以使用<code>docker ps -a</code>命令：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707105630249.png" alt="image-20200707105630249" loading="lazy"></p>
+<h2 id="4-3-进入容器"><a href="#4-3-进入容器" class="headerlink" title="4.3.进入容器"></a>4.3.进入容器</h2><p>如果我们要修改nginx的欢迎页面内容，或者修改Nginx的配置文件，就必须进入nginx的容器中。</p>
+<p>使用<code>docker exec</code>命令可以做到，基本语法：</p>
+<pre class="language-none"><code class="language-none">docker exec [OPTIONS] CONTAINER COMMAND [ARG...]</code></pre>
+
+<p>说明：</p>
+<ul>
+<li>OPTIONS：可选项，这里常用的两个是：<ul>
+<li><code>-i</code>：开启一个容器关联的STDIN（标准输入），允许用户通过控制台输入命令</li>
+<li><code>-t</code>：分配一个虚拟的TTY终端，让用户与容器交互</li>
+</ul>
+</li>
+<li>CONTAINER：容器名称或者容器ID</li>
+<li>COMMAND：进入容器后要执行的命令</li>
+<li>ARG：命令参数</li>
+</ul>
+<p>通过<code>docker exec --help</code>查看详细的使用说明。</p>
+<p>示例，我们进入nginx容器：</p>
+<pre class="language-none"><code class="language-none">docker exec -it my-nginx bash</code></pre>
+
+<p>这里我们进入容器后，允许bash命令，也就是Linux中的bash交互界面</p>
+<p>效果：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707110928154.png" alt="image-20200707110928154" loading="lazy"> </p>
+<p>如同进入了一个新的Linux环境。</p>
+<p>docker中的Nginx默认html目录是在：<code>/usr/share/nginx/html</code>目录：</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh"># 进入nginx的html目录
+cd usr&#x2F;share&#x2F;nginx&#x2F;html&#x2F;
+# 查看内容
+ls</code></pre>
+
+<p>包含两个文件：</p>
+<pre class="language-none"><code class="language-none">50x.html  index.html</code></pre>
+
+<p>修改index.html内容：</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh">echo &quot;&lt;html&gt;&lt;head&gt;&lt;meta charset&#x3D;&quot;utf-8&quot;&gt; &lt;&#x2F;head&gt; &lt;h1&gt;风里雨里我在等你&lt;&#x2F;h1&gt;&lt;&#x2F;html&gt;&quot; &gt; index.html</code></pre>
+
+
+
+<p>再次访问虚拟机地址：<a target="_blank" rel="noopener" href="http://yourip/">http://yourIp</a></p>
+<p>控制台输入：<code>exit</code>即可退出容器。</p>
+<h2 id="4-4-启动和停止容器"><a href="#4-4-启动和停止容器" class="headerlink" title="4.4.启动和停止容器"></a>4.4.启动和停止容器</h2><p><code>docker run</code>命令是创建一个容器，然后运行。如果一个容器已经存在了，我们怎么操作呢？</p>
+<p>当容器创建后，我们可以通过下列命令可以控制容器的启动或停止：</p>
+<pre class="language-shell" data-language="shell"><code class="language-shell"><span class="token comment"># 启动</span>
+docker start CONTAINER
+<span class="token comment"># 停止</span>
+docker stop CONTAINER
+<span class="token comment"># 重启</span>
+docker restart CONTAINER</code></pre>
+
+
+
+
+
+<h2 id="4-5-查看运行日志"><a href="#4-5-查看运行日志" class="headerlink" title="4.5.查看运行日志"></a>4.5.查看运行日志</h2><p>如何查看一个正在运行的容器的运行日志呢？</p>
+<p>通过 <code>docker logs</code>命令，语法如下：</p>
+<pre class="language-none"><code class="language-none">[root@localhost ~]# docker logs --help
+
+Usage:  docker logs [OPTIONS] CONTAINER
+
+Fetch the logs of a container
+
+Options:
+      --details        Show extra details provided to logs
+  -f, --follow         Follow log output
+      --help           Print usage
+      --since string   Show logs since timestamp
+      --tail string    Number of lines to show from the end of the logs (default &quot;all&quot;)
+  -t, --timestamps     Show timestamps</code></pre>
+
+<p>说明：</p>
+<ul>
+<li>OPTIONS：可选项<ul>
+<li><code>-f</code>：跟踪显示日志。当有新日志产生，控制台会持续打印日志</li>
+<li><code>--tail</code>：指定输出最后的n行日志，不指定则显示所有日志</li>
+</ul>
+</li>
+<li>CONTAINER：容器名或容器ID</li>
+</ul>
+<p>示例：</p>
+<pre class="language-none"><code class="language-none">docker logs -f my-nginx</code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707115350664.png" alt="image-20200707115350664" loading="lazy"></p>
+<h2 id="4-6-删除容器"><a href="#4-6-删除容器" class="headerlink" title="4.6.删除容器"></a>4.6.删除容器</h2><p>通过<code>docker rm</code>命令可以删除一个容器，语法：</p>
+<pre class="language-none"><code class="language-none">[root@localhost ~]# docker rm --help
+
+Usage:  docker rm [OPTIONS] CONTAINER [CONTAINER...]
+
+Remove one or more containers
+
+Options:
+  -f, --force     Force the removal of a running container (uses SIGKILL)
+      --help      Print usage
+  -l, --link      Remove the specified link
+  -v, --volumes   Remove the volumes associated with the container</code></pre>
+
+<p>说明：</p>
+<ul>
+<li>OPTIONS：可选项<ul>
+<li><code>-f</code>：<code>docker rm</code> 只能删除停止状态的容器，<code>-f</code>强制删除一个运行中的容器。</li>
+<li><code>-v</code>：删除容器的同时，删除关联的数据卷</li>
+</ul>
+</li>
+<li>CONTAINER：容器名或容器ID</li>
+</ul>
+<h1 id="6-数据卷管理"><a href="#6-数据卷管理" class="headerlink" title="6.数据卷管理"></a>6.数据卷管理</h1><p>刚刚我们利用docker部署了一台nginx服务，但是nginx服务的配置文件、html目录都是在docker内部的。</p>
+<p>那么随着程序的运行，我们会有新的web资源需要添加到html目录，或者要修改nginx的配置文件，进入容器修改很不方便。另外，以后如果要对容器升级，以前的数据就都不可用了。</p>
+<p>最好的办法是把这些变化的数据记录在容器之外的宿主机上，实现<strong>容器与数据的分离</strong>。</p>
+<p>因此，本节会学习如何将docker数据保存在宿主机。</p>
+<h2 id="6-1-数据卷"><a href="#6-1-数据卷" class="headerlink" title="6.1.数据卷"></a>6.1.数据卷</h2><p><code>数据卷</code> 是一个可供一个或多个容器使用的特殊目录，一般是在宿主机的某个特定的目录下。可以提供很多有用的特性：</p>
+<ul>
+<li><code>数据卷</code> 可以在容器之间共享和重用</li>
+<li>对 <code>数据卷</code> 的修改会立马在挂载数据卷的容器中可见</li>
+<li>对 <code>数据卷</code> 的更新，不会影响镜像</li>
+<li><code>数据卷</code> 默认会一直存在，即使容器被删除</li>
+</ul>
+<p>通过<code>docker volume</code>命令可以管理数据卷，语法包括：</p>
+<pre class="language-none"><code class="language-none">[root@localhost ~]# docker volume --help
+
+Usage:  docker volume COMMAND
+
+Manage volumes
+
+Options:
+      --help   Print usage
+
+Commands:
+  create      Create a volume
+  inspect     Display detailed information on one or more volumes
+  ls          List volumes
+  prune       Remove all unused volumes
+  rm          Remove one or more volumes</code></pre>
+
+<p>说明：<code>docker volume COMMAND</code></p>
+<ul>
+<li>COMMAND：要运行的数据卷指令<ul>
+<li>create：创建一个数据卷</li>
+<li>inspect：显示一个或多个指定数据卷的详细信息</li>
+<li>ls：查看所有的数据卷</li>
+<li>prune：删除所有未使用的数据卷</li>
+<li>rm：删除一个或多个指定的数据卷</li>
+</ul>
+</li>
+</ul>
+<p>通过<code>docker volume create</code>来实现，示例：</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh"># 创建一个名为html的数据卷
+docker volume create html</code></pre>
+
+<p>通过<code>docker volume ls</code>查看所有的数据卷：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707161128677.png" alt="image-20200707161128677" loading="lazy"></p>
+<h2 id="6-2-挂载数据卷"><a href="#6-2-挂载数据卷" class="headerlink" title="6.2.挂载数据卷"></a>6.2.挂载数据卷</h2><p>只有在创建容器时才可以挂载数据卷。我们先删除之前的nginx容器：</p>
+<pre class="language-none"><code class="language-none">docker rm my-nginx -f</code></pre>
+
+<p>然后重新创建一个容器，并挂载刚刚指定的数据卷：</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh">docker run --name my-nginx -p 80:80 -v html:&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html -d nginx</code></pre>
+
+
+
+<p>然后，通过命令查看数据卷html在宿主机的物理地址：</p>
+<pre class="language-none"><code class="language-none">docker volume inspect html</code></pre>
+
+<p>结果：</p>
+<pre class="language-json" data-language="json"><code class="language-json"><span class="token punctuation">[</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token property">"Driver"</span><span class="token operator">:</span> <span class="token string">"local"</span><span class="token punctuation">,</span>
+        <span class="token property">"Labels"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+        <span class="token property">"Mountpoint"</span><span class="token operator">:</span> <span class="token string">"/var/lib/docker/volumes/html/_data"</span><span class="token punctuation">,</span>
+        <span class="token property">"Name"</span><span class="token operator">:</span> <span class="token string">"html"</span><span class="token punctuation">,</span>
+        <span class="token property">"Options"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+        <span class="token property">"Scope"</span><span class="token operator">:</span> <span class="token string">"local"</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">]</span></code></pre>
+
+<p>进入该目录查看：</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh">cd &#x2F;var&#x2F;lib&#x2F;docker&#x2F;volumes&#x2F;html&#x2F;_data</code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707161538416.png" alt="image-20200707161538416" loading="lazy"></p>
+<p>修改这个<code>index.html</code>文件：</p>
+<pre class="language-html" data-language="html"><code class="language-html"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">html</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">http-equiv</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>content-type<span class="token punctuation">"</span></span> <span class="token attr-name">content</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>text/html;charset=utf-8<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">></span></span>11官网不一样的品质<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>style</span><span class="token punctuation">></span></span><span class="token style"><span class="token language-css">
+    <span class="token selector">body</span> <span class="token punctuation">&#123;</span>
+        <span class="token property">width</span><span class="token punctuation">:</span> 35em<span class="token punctuation">;</span>
+        <span class="token property">margin</span><span class="token punctuation">:</span> 0 auto<span class="token punctuation">;</span>
+        <span class="token property">font-family</span><span class="token punctuation">:</span> Tahoma<span class="token punctuation">,</span> Verdana<span class="token punctuation">,</span> Arial<span class="token punctuation">,</span> sans-serif<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>style</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h1</span><span class="token punctuation">></span></span>aaa!<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h1</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>aaa.<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>查看最新信息：
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://www.baidu.com<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>11<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span>.<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">/></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>em</span><span class="token punctuation">></span></span>Thank you for using nginx.<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>em</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span></code></pre>
+
+<p>再次访问你的虚拟机地址：<a target="_blank" rel="noopener" href="http://youip/">http://youIp</a></p>
+<p><strong>注意</strong>：如果在运行容器时指定了数据卷，而数据卷不存在，docker会自动创建一个数据卷。</p>
+<h2 id="6-3-挂载本地文件或文件夹"><a href="#6-3-挂载本地文件或文件夹" class="headerlink" title="6.3.挂载本地文件或文件夹"></a>6.3.挂载本地文件或文件夹</h2><p>除了挂载数据卷以外，docker也允许你挂载一个指定的本地目录或者本地文件。比如我希望在运行nginx的同时挂载一个本地的nginx配置文件，方便以后修改nginx配置。</p>
+<p>首先，我们在宿主机的任意目录，创建一个文件：nginx.conf，</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh"># 创建nginx.conf文件
+touch nginx.conf
+# 编辑nginx.conf文件
+vi nginx.conf</code></pre>
+
+<p>内容如下：</p>
+<pre class="language-nginx" data-language="nginx"><code class="language-nginx"><span class="token keyword">worker_processes</span>  <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token keyword">events</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">worker_connections</span> <span class="token number">1024</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>  
+<span class="token keyword">http</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">default_type</span>  text<span class="token operator">/</span>html<span class="token punctuation">;</span> <span class="token comment"># 默认响应类型是html</span>
+	
+	<span class="token keyword">server</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">listen</span> <span class="token number">80</span><span class="token punctuation">;</span>
+		<span class="token keyword">location</span> <span class="token operator">/</span>s <span class="token punctuation">&#123;</span>
+            <span class="token comment"># 以/s开头的路径，会代理到百度</span>
+			<span class="token keyword">proxy_pass</span> <span class="token keyword">https</span><span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>www<span class="token punctuation">.</span>baidu<span class="token punctuation">.</span>com<span class="token punctuation">;</span>
+		<span class="token punctuation">&#125;</span>
+		<span class="token keyword">location</span> <span class="token operator">/</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">root</span>	<span class="token operator">/</span>usr<span class="token operator">/</span>share<span class="token operator">/</span>nginx<span class="token operator">/</span>html<span class="token punctuation">;</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span></code></pre>
+
+
+
+<p>然后，我们删除之前的nginx容器：</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh">docker rm my-nginx -f</code></pre>
+
+<p>创建一个新的容器：</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh">docker run --name my-nginx -p 80:80 -v html:&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html -v $PWD&#x2F;nginx.conf:&#x2F;etc&#x2F;nginx&#x2F;nginx.conf --privileged -d nginx</code></pre>
+
+<p>命令说明：</p>
+<ul>
+<li><code>--name my-nginx</code>：容器名称为my-nginx</li>
+<li><code>-p 80:80</code>：将容器的80端口映射到宿主机的80端口</li>
+<li><code>-v html:/usr/share/nginx/html</code>：挂载html数据卷到容器的<code>/usr/share/nginx/html</code>目录</li>
+<li><code>-v $PWD/nginx.conf:/etc/nginx/nginx.conf</code>：<ul>
+<li><code>$PWD/nginx.conf</code>：当前目录下的nginx.conf文件</li>
+<li>把宿主机当前目录下的<code>nginx.conf</code>文件挂载到容器内的<code>/etc/nginx/nginx.conf</code>文件</li>
+</ul>
+</li>
+<li><code>--privileged</code>：授予本地目录的访问权限</li>
+<li><code>-d</code>：后台运行</li>
+<li><code>nginx</code>：镜像名称</li>
+</ul>
+<p>然后，在浏览器访问：<a target="_blank" rel="noopener" href="http://youip/s%EF%BC%8C%E4%BE%8B%E5%A6%82%E6%88%91%E7%9A%84%EF%BC%9Ahttp://192.168.150.101/s%EF%BC%9A">http://youIp/s，例如我的：http://192.168.150.101/s：</a></p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707164946938.png" alt="image-20200707164946938" loading="lazy"></p>
+<p>输入一个关键字搜索试试：</p>
+<h1 id="7-网络管理"><a href="#7-网络管理" class="headerlink" title="7.网络管理"></a>7.网络管理</h1><p>当我们要部署基于docker的微服务群时，往往会需要容器之间互相连接。这时就需要用到Docker中的网络配置了。</p>
+<p>通过<code>docker network</code>命令可以管理docker网络。</p>
+<pre class="language-none"><code class="language-none">[root@localhost ~]# docker network --help
+
+Usage:  docker network COMMAND
+
+Manage networks
+
+Options:
+      --help   Print usage
+
+Commands:
+  connect     Connect a container to a network
+  create      Create a network
+  disconnect  Disconnect a container from a network
+  inspect     Display detailed information on one or more networks
+  ls          List networks
+  prune       Remove all unused networks
+  rm          Remove one or more networks</code></pre>
+
+<p>说明：</p>
+<ul>
+<li>connect：把一个容器连接到指定的network</li>
+<li>create：创建一个network</li>
+<li>disconnect：将一个容器从指定的network断开</li>
+<li>inspect：显示某个network的详细信息</li>
+<li>ls：列出所有的network</li>
+<li>prune：删除未使用的network</li>
+<li>rm：删除指定的一个或多个network</li>
+</ul>
+<h2 id="7-1-创建network"><a href="#7-1-创建network" class="headerlink" title="7.1.创建network"></a>7.1.创建network</h2><p>通过<code>docker network create</code>命令来创建，示例：</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh">docker network create -d bridge my-net</code></pre>
+
+<p>说明：</p>
+<ul>
+<li><code>-d</code>：指定网络类型，可以是：bridge、overlay，默认是bridge</li>
+</ul>
+<h2 id="7-2-查看network"><a href="#7-2-查看network" class="headerlink" title="7.2.查看network"></a>7.2.查看network</h2><p>通过<code>docker network ls</code>查看network，示例：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707172721655.png" alt="image-20200707172721655" loading="lazy"></p>
+<p>可以看到，除了我们刚刚创建的my-net外，还有几个默认的网络。</p>
+<p>另外，还可以通过命令查看具体信息：</p>
+<pre class="language-none"><code class="language-none">docker network inspect my-net</code></pre>
+
+<p>结果：</p>
+<pre class="language-json" data-language="json"><code class="language-json">
+<span class="token punctuation">[</span>
+    <span class="token punctuation">&#123;</span>
+        <span class="token property">"Name"</span><span class="token operator">:</span> <span class="token string">"my-net"</span><span class="token punctuation">,</span>
+        <span class="token property">"Id"</span><span class="token operator">:</span> <span class="token string">"bf3efa08d055d38c44cabee47bbd45145dd69d7d6609028e9b9905cf0f17f7a7"</span><span class="token punctuation">,</span>
+        <span class="token property">"Created"</span><span class="token operator">:</span> <span class="token string">"2020-07-07T16:11:48.193977107+08:00"</span><span class="token punctuation">,</span>
+        <span class="token property">"Scope"</span><span class="token operator">:</span> <span class="token string">"local"</span><span class="token punctuation">,</span>
+        <span class="token property">"Driver"</span><span class="token operator">:</span> <span class="token string">"bridge"</span><span class="token punctuation">,</span>
+        <span class="token property">"EnableIPv6"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+        <span class="token property">"IPAM"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span>
+            <span class="token property">"Driver"</span><span class="token operator">:</span> <span class="token string">"default"</span><span class="token punctuation">,</span>
+            <span class="token property">"Options"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+            <span class="token property">"Config"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+                <span class="token punctuation">&#123;</span>
+                    <span class="token property">"Subnet"</span><span class="token operator">:</span> <span class="token string">"172.18.0.0/16"</span><span class="token punctuation">,</span>
+                    <span class="token property">"Gateway"</span><span class="token operator">:</span> <span class="token string">"172.18.0.1"</span>
+                <span class="token punctuation">&#125;</span>
+            <span class="token punctuation">]</span>
+        <span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+        <span class="token property">"Internal"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+        <span class="token property">"Attachable"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+        <span class="token property">"Containers"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+        <span class="token property">"Options"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+        <span class="token property">"Labels"</span><span class="token operator">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">]</span></code></pre>
+
+
+
+<h2 id="7-3-连接network"><a href="#7-3-连接network" class="headerlink" title="7.3.连接network"></a>7.3.连接network</h2><p>可以将一个已经运行的容器连接到某个network：</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh">docker network connect my-net my-nginx</code></pre>
+
+
+
+<p>也可以在创建容器时，连接一个network：</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh">docker run -it --rm --name busybox1 --network my-net busybox sh</code></pre>
+
+<p>说明：</p>
+<ul>
+<li><code>-it</code>：运行容器并保持一个可交互的shell终端</li>
+<li><code>--rm</code>：容器退出时，自动删除容器</li>
+<li><code>--network my-net</code>：连接到my-net网络</li>
+<li><code>busybox</code>：是一个测试用的简单容器</li>
+</ul>
+<p>运行后会自动进入容器，并开启一个shell终端，为了测试网络，我们可以执行命令：</p>
+<pre class="language-none"><code class="language-none">ping my-nginx</code></pre>
+
+<p>用容器名去测试连接：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200707173537790.png" alt="image-20200707173537790" loading="lazy"></p>
+<h1 id="8-DockerFile"><a href="#8-DockerFile" class="headerlink" title="8.DockerFile"></a>8.DockerFile</h1><p>从DockerHub中拉取的镜像，往往都是一些基础镜像，在实际开发中需要做一些定制和修改。</p>
+<p>这就需要自定义镜像的功能了，而自定义镜像就要用到Dockerfile配置文件。</p>
+<h2 id="8-1-快速入门"><a href="#8-1-快速入门" class="headerlink" title="8.1.快速入门"></a>8.1.快速入门</h2><p>我们基于nginx的官方镜像，做一个定制，把自定义的index.html内容添加到官方镜像中。</p>
+<p>在任意位置创建一个空文件夹：nginx</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh">mkdir nginx</code></pre>
+
+<p>然后进入nginx目录：</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh">cd nginx</code></pre>
+
+<p>新建一个index.html文件，内容如下：</p>
+<pre class="language-html" data-language="html"><code class="language-html"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">html</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">http-equiv</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>content-type<span class="token punctuation">"</span></span> <span class="token attr-name">content</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>text/html;charset=utf-8<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">></span></span>11不一样的品质<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>style</span><span class="token punctuation">></span></span><span class="token style"><span class="token language-css">
+    <span class="token selector">body</span> <span class="token punctuation">&#123;</span>
+        <span class="token property">width</span><span class="token punctuation">:</span> 35em<span class="token punctuation">;</span>
+        <span class="token property">margin</span><span class="token punctuation">:</span> 0 auto<span class="token punctuation">;</span>
+        <span class="token property">font-family</span><span class="token punctuation">:</span> Tahoma<span class="token punctuation">,</span> Verdana<span class="token punctuation">,</span> Arial<span class="token punctuation">,</span> sans-serif<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>style</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h1</span><span class="token punctuation">></span></span>欢aaa!<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h1</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>aaaaa<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span>查看最新信息：
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://www.baidu.com<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>11<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span>.<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>br</span><span class="token punctuation">/></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>em</span><span class="token punctuation">></span></span>Thank you for using nginx.<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>em</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span></code></pre>
+
+
+
+<p>创建一个Dockerfile文件：</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh">touch Dockerfile</code></pre>
+
+<p>内容如下：</p>
+<pre class="language-dockerfile" data-language="dockerfile"><code class="language-dockerfile"># 从官方的nginx镜像开始
+FROM nginx
+# 拷贝一个本地的index.html到&#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html目录中
+COPY index.html &#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html</code></pre>
+
+<p>说明：</p>
+<ul>
+<li><code>FROM</code>：代表构建镜像的基础，这里是以nginx镜像为基础</li>
+<li><code>COPY</code>：拷贝一个本地文件到镜像中的指定目录</li>
+</ul>
+<p>然后运行命令：</p>
+<pre class="language-sh" data-language="sh"><code class="language-sh">docker build -t my-nginx:v1 .</code></pre>
+
+<p><code>docker build</code>命令的作用是基于Dockerfile构建一个镜像，详细用法可以通过<code>docker build --help</code>查看。当前命令说明：</p>
+<ul>
+<li><code>-t my-nginx:v1</code>：<code>-t</code>是设置镜像tag，这里设置镜像名为：<code>my-nginx</code>，tag为<code>v1</code></li>
+<li><code>.</code>：最后有一个<code>.</code>，别看漏了。是指构建镜像的工作目录为当前目录，会读取当前目录的Dockerfile来完成构建。</li>
+</ul>
+<p>如图：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200708114809830.png" alt="image-20200708114809830" loading="lazy"></p>
+<p>然后通过<code>docker images</code>查看镜像：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200708114940143.png" alt="image-20200708114940143" loading="lazy"></p>
+<p>试着运行一下：</p>
+<pre class="language-none"><code class="language-none">docker run --name mn -p 8081:80 -d my-nginx:v1</code></pre>
+
+<p>然后访问浏览器：</p>
+<h2 id="8-2-详细语法介绍"><a href="#8-2-详细语法介绍" class="headerlink" title="8.2.详细语法介绍"></a>8.2.详细语法介绍</h2><p>除了我们刚刚用到的<code>FROM</code>和<code>COPY</code>，Dockerfile的指令有很多。详见官网：</p>
+<p><a target="_blank" rel="noopener" href="https://docs.docker.com/engine/reference/builder/#from">https://docs.docker.com/engine/reference/builder/#from</a></p>
+<p>我们列举一些比较常用的。</p>
+<h3 id="1）FROM"><a href="#1）FROM" class="headerlink" title="1）FROM"></a>1）FROM</h3><p>作用是指定基础镜像。自定义镜像，是以一个镜像为基础，在其上进行定制，例如我们从Nginx镜像开始，拷贝一个自己的文件进去。</p>
+<p>基础镜像是必须指定的。而 <code>FROM</code> 就是指定 <strong>基础镜像</strong>的命令，因此一个 <code>Dockerfile</code> 中 <code>FROM</code> 是必备的指令，并且<strong>必须是第一条指令</strong>。</p>
+<h3 id="2）COPY"><a href="#2）COPY" class="headerlink" title="2）COPY"></a>2）COPY</h3><p>拷贝一个本地文件或目录到镜像中指定位置，语法格式：</p>
+<pre class="language-none"><code class="language-none">COPY [--chown&#x3D;:] &lt;源路径&gt;... &lt;目标路径&gt;</code></pre>
+
+<p>比如：</p>
+<pre class="language-docker" data-language="docker"><code class="language-docker"><span class="token keyword">COPY</span> index.html /usr/html/</code></pre>
+
+<p><code>&lt;源路径&gt;</code> 可以是多个，甚至可以是通配符，其通配符规则要满足 Go 的 <a target="_blank" rel="noopener" href="https://golang.org/pkg/path/filepath/#Match"><code>filepath.Match</code></a> 规则，如：</p>
+<pre class="language-docker" data-language="docker"><code class="language-docker"><span class="token keyword">COPY</span> my* /mydir/
+<span class="token keyword">COPY</span> my<span class="token punctuation">?</span>.html /mydir/</code></pre>
+
+<p>此外，还需要注意一点，使用 <code>COPY</code> 指令，源文件的各种元数据都会保留。比如读、写、执行权限、文件变更时间等。这个特性对于镜像定制很有用。特别是构建相关文件都在使用 Git 进行管理的时候。</p>
+<p>在使用该指令的时候还可以加上 <code>--chown=:</code> 选项来改变文件的所属用户及所属组。</p>
+<pre class="language-docker" data-language="docker"><code class="language-docker"><span class="token keyword">COPY</span> <span class="token punctuation">-</span><span class="token punctuation">-</span>chown=lisi<span class="token punctuation">:</span>group1 files* /mydir/</code></pre>
+
+
+
+<h3 id="3）RUN"><a href="#3）RUN" class="headerlink" title="3）RUN"></a>3）RUN</h3><p>RUN有2种形式：</p>
+<ul>
+<li><code>RUN &lt;command&gt; </code></li>
+<li><code>RUN [&quot;executable&quot;, &quot;param1&quot;, &quot;param2&quot;]</code></li>
+</ul>
+<p>该<code>RUN</code>指令将在当前顶部的layer层中执行所有命令，并提交为新镜像。例如：</p>
+<pre class="language-none"><code class="language-none">RUN tar -xvf redis.tar.gz
+RUN cd redis
+RUN make
+RUN make install</code></pre>
+
+<p>注意，每运行一次RUN命令就会生成一层新的layer层，产生新的镜像，因此应该把多个RUN命令利用<code>&amp;&amp;</code>符号串接作为一个命令执行，多行命令用 <code>\</code>来换行：</p>
+<pre class="language-none"><code class="language-none">RUN tar -xvf redis.tar.gz \
+	&amp;&amp; cd redis \
+	&amp;&amp; make \
+	&amp;&amp; make install </code></pre>
+
+
+
+<h3 id="4）ENV"><a href="#4）ENV" class="headerlink" title="4）ENV"></a>4）ENV</h3><p>ENV格式有两种：</p>
+<ul>
+<li><code>ENV &lt;key&gt; &lt;value&gt;  </code></li>
+<li><code>ENV &lt;key1&gt;=&lt;value1&gt; &lt;key2&gt;=&lt;value2&gt;...</code></li>
+</ul>
+<p>这个指令很简单，就是设置环境变量而已，后面的其它指令，可以直接使用这里定义的环境变量。</p>
+<p>例如：</p>
+<pre class="language-dockerfile" data-language="dockerfile"><code class="language-dockerfile"><span class="token comment"># 定义目录</span>
+<span class="token keyword">ENV</span> BASE_DIR=/usr/local/src
+<span class="token comment"># 使用</span>
+<span class="token keyword">RUN</span> cd $BASE_DIR \
+	&amp;&amp; copy /tmp/redis.tar.gz $BASE_DIR
+	&amp;&amp; tar <span class="token punctuation">-</span>xvf redis.tar.gz</code></pre>
+
+
+
+<h3 id="5）Volume"><a href="#5）Volume" class="headerlink" title="5）Volume"></a>5）Volume</h3><p>匿名卷，格式为：</p>
+<ul>
+<li><code>VOLUME [&quot;&lt;路径1&gt;&quot;, &quot;&lt;路径2&gt;&quot;...]</code></li>
+<li><code>VOLUME &lt;路径&gt;</code></li>
+</ul>
+<p>容器运行时应该尽量保持容器存储层不发生写操作，例如运行一个MySQL容器，需要保存动态数据，其数据库文件应该保存于卷(volume)中。</p>
+<p>为了防止运行时用户忘记将动态文件所保存目录挂载为卷，在 <code>Dockerfile</code> 中，我们可以事先指定某些目录挂载为匿名卷，这样在运行时如果用户不指定挂载，其应用也可以正常运行，不会向容器存储层写入大量数据。</p>
+<h3 id="6）CMD"><a href="#6）CMD" class="headerlink" title="6）CMD"></a>6）CMD</h3><p>语法格式：</p>
+<ul>
+<li><code>CMD [命令]</code></li>
+<li><code>CMD [&quot;可执行命令&quot;, &quot;参数1&quot;, &quot;参数2&quot; ...]</code></li>
+</ul>
+<p>Docker的容器，本质是一个被隔离起来的进程，因此启动容器必须要指定所运行的程序及参数。<code>CMD</code> 指令就是用于指定默认的容器主进程的启动命令的。</p>
+<p>因为容器本身是一个进程，进程结束则容器退出。因此容器的主进程不能是后台运行的进程，因为后台运行的命令结束后，容器就退出了。例如：</p>
+<pre class="language-none"><code class="language-none">service nginx start</code></pre>
+
+<p>这个命令希望把Nginx作为一个后台服务来运行，但是当<code>service</code>命令本身结束，容器就结束了。</p>
+<p>正确的做法是直接运行Nginx执行文件，让它前台运行：</p>
+<pre class="language-dockerfile" data-language="dockerfile"><code class="language-dockerfile"><span class="token keyword">CMD</span> <span class="token punctuation">[</span><span class="token string">"nginx"</span><span class="token punctuation">,</span> <span class="token string">"-g"</span><span class="token punctuation">,</span> <span class="token string">"daemon off;"</span><span class="token punctuation">]</span></code></pre>
+
+
+
+
+
+<h3 id="7）ENTRYPOINT"><a href="#7）ENTRYPOINT" class="headerlink" title="7）ENTRYPOINT"></a>7）ENTRYPOINT</h3><p><code>ENTRYPOINT</code> 的目的和 <code>CMD</code> 一样，都是在指定容器启动程序及参数。语法也类似：</p>
+<ul>
+<li><code>ENTRYPOINT [命令] 参数 ...</code></li>
+<li><code>ENTRYPOINT [&quot;可执行命令&quot;, &quot;参数1&quot;, &quot;参数2&quot; ...]</code></li>
+</ul>
+<p>既然有了CMD，为什么还需要<code>ENTRYPOINT</code>呢？，因为<code>ENTRYPOINT</code>可以让我们在运行容器的时候加入自定义参数。而CMD的运行参数都是Dockerfile中配置好的，运行时无法修改。</p>
+<h3 id="8）EXPOSE"><a href="#8）EXPOSE" class="headerlink" title="8）EXPOSE"></a>8）EXPOSE</h3><p>语法格式为：</p>
+ <pre class="language-none"><code class="language-none">EXPOSE &lt;端口1&gt; [&lt;端口2&gt;...]</code></pre>
+
+<p><code>EXPOSE</code> 指令是声明运行时容器将提供服务端口，这只是一个声明，在运行时并不会因为这个声明应用就会开启这个端口的服务。</p>
+<p>也就是说 <code>EXPOSE</code> 仅仅是声明容器打算使用什么端口而已，并不会自动在宿主进行端口映射。</p>
+<h2 id="8-3-从0构建Nginx镜像"><a href="#8-3-从0构建Nginx镜像" class="headerlink" title="8.3.从0构建Nginx镜像"></a>8.3.从0构建Nginx镜像</h2><p>我们利用刚才的语法，从0构建一个nginx镜像。</p>
+<p>进入刚刚案例中创建的nginx目录，上传一个文件到目录中：</p>
+<p>上传后如图：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200708155747419.png" alt="image-20200708155747419" loading="lazy"></p>
+<p>然后，修改目录下的Dockerfile文件，内容如下：</p>
+<pre class="language-dockerfile" data-language="dockerfile"><code class="language-dockerfile"><span class="token comment"># 基于centos6安装</span>
+<span class="token keyword">FROM</span> centos<span class="token punctuation">:</span>6.6
+<span class="token comment"># 说明</span>
+<span class="token keyword">LABEL</span> author=<span class="token string">"虎哥"</span>
+<span class="token keyword">LABEL</span> description=<span class="token string">"自定义nginx镜像"</span>
+<span class="token keyword">LABEL</span> version=<span class="token string">"1.0"</span>
+
+<span class="token comment">#拷贝nginx的安装包</span>
+<span class="token keyword">COPY</span> nginx<span class="token punctuation">-</span>1.10.0.tar.gz /usr/local/src
+
+<span class="token comment"># 环境变量</span>
+<span class="token keyword">ENV</span> NGX_DIR=/opt/nginx
+
+<span class="token comment">#安装依赖、解压、编译、安装</span>
+<span class="token keyword">RUN</span> yum <span class="token punctuation">-</span>y install pcre pcre<span class="token punctuation">-</span>devel zlib zlib<span class="token punctuation">-</span>devel openssl openssl<span class="token punctuation">-</span>devel gcc tar \
+    &amp;&amp; cd /usr/local/src \
+	&amp;&amp; tar <span class="token punctuation">-</span>xvf nginx<span class="token punctuation">-</span>1.10.0.tar.gz \
+	&amp;&amp; rm <span class="token punctuation">-</span>rf nginx<span class="token punctuation">-</span>1.10.0.tar.gz \
+	&amp;&amp; cd nginx<span class="token punctuation">-</span>1.10.0 \
+	&amp;&amp; ./configure <span class="token punctuation">-</span><span class="token punctuation">-</span>prefix=$NGX_DIR <span class="token punctuation">-</span><span class="token punctuation">-</span>sbin<span class="token punctuation">-</span>path=/usr/bin/nginx \
+	&amp;&amp; make \
+	&amp;&amp; make install 
+
+<span class="token comment">#设置数据挂载目录以及工作目录</span>
+<span class="token keyword">VOLUME</span> $NGX_DIR/logs
+
+<span class="token comment">#容器启动后执行该命令</span>
+<span class="token keyword">ENTRYPOINT</span> <span class="token punctuation">[</span><span class="token string">"nginx"</span><span class="token punctuation">,</span> <span class="token string">"-g"</span><span class="token punctuation">,</span> <span class="token string">"daemon off;"</span><span class="token punctuation">]</span>
+
+<span class="token comment">#设置对外的端口号</span>
+<span class="token keyword">EXPOSE</span> 80</code></pre>
+
+
+
+<p>然后再次构建一个镜像：</p>
+<pre class="language-none"><code class="language-none">docker build -t my-nginx:v2 .</code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200708161724629.png" alt="image-20200708161724629" loading="lazy"></p>
+<p>通过<code>docker images</code>查看：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200708161757012.png" alt="image-20200708161757012" loading="lazy"></p>
+<p>然后可以像之前运行官方镜像一样运行这个镜像了。</p>
+<h1 id="9-部署项目"><a href="#9-部署项目" class="headerlink" title="9.部署项目"></a>9.部署项目</h1><p>接下来，我们演示下常见的一些软件的Docker安装方式。</p>
+<h2 id="9-2-安装MySQL"><a href="#9-2-安装MySQL" class="headerlink" title="9.2.安装MySQL"></a>9.2.安装MySQL</h2><h3 id="9-2-1-准备镜像"><a href="#9-2-1-准备镜像" class="headerlink" title="9.2.1.准备镜像"></a>9.2.1.准备镜像</h3><p>如果网络环境很好的同学，可以自己拉取镜像：</p>
+<pre class="language-none"><code class="language-none">docker pull mysql:5.7.25</code></pre>
+
+
+
+<p>如果网络环境一般，可以使用课前资料提供的MySQL镜像包，然后，上传到虚拟机中的<code>/tmp</code>目录，然后执行命令：</p>
+<pre class="language-shell" data-language="shell"><code class="language-shell"><span class="token builtin class-name">cd</span> /tmp
+<span class="token comment"># 加载镜像</span>
+docker load -i mysql.tar</code></pre>
+
+
+
+<h3 id="9-2-2-挂载本地目录"><a href="#9-2-2-挂载本地目录" class="headerlink" title="9.2.2.挂载本地目录"></a>9.2.2.挂载本地目录</h3><p>MySQL中存储的数据会越来越多，为了不影响容器体积，我们需要把MySQL的数据和配置目录挂载到宿主机。</p>
+<p>首先 创建一个新用户leyou：</p>
+<pre class="language-none"><code class="language-none">useradd leyou</code></pre>
+
+<p>设置密码</p>
+<pre class="language-none"><code class="language-none">passwd leyou</code></pre>
+
+<p>然后会提示要求你输入密码，两次确认后密码设置完成。</p>
+<p>进入leyou用户的目录：</p>
+<pre class="language-none"><code class="language-none">cd &#x2F;home&#x2F;leyou</code></pre>
+
+
+
+<p>创建文件夹并进入：</p>
+<pre class="language-none"><code class="language-none">mkdir mysql
+cd mysql</code></pre>
+
+
+
+<h3 id="9-2-3-运行mysql容器"><a href="#9-2-3-运行mysql容器" class="headerlink" title="9.2.3.运行mysql容器"></a>9.2.3.运行mysql容器</h3><p>进入/home/leyou/mysql然后执行docker命令：</p>
+<pre class="language-none"><code class="language-none">docker run \
+ -p 3306:3306 \
+ --name mysql \
+ -v $PWD&#x2F;conf:&#x2F;etc&#x2F;mysql&#x2F;conf.d \
+ -v $PWD&#x2F;data:&#x2F;var&#x2F;lib&#x2F;mysql \
+ -e MYSQL_ROOT_PASSWORD&#x3D;123 \
+ --privileged \
+ -d \
+ mysql:5.7.25</code></pre>
+
+<p>关键信息说明：</p>
+<ul>
+<li><code> -v $PWD/conf:/etc/mysql/conf.d</code>：是将当前目录的<code>conf</code>目录与docker容器中的<code>/etc/mysql/conf.d</code>目录绑定，可以自己指定配置文件</li>
+<li><code>-v $PWD/data:/var/lib/mysql</code>：是将当前目录下的的data目录与MySQL容器中的数据目录<code>/var/lib/mysql</code>挂载，我们就可以再data下看到数据</li>
+<li><code>-e MYSQL_ROOT_PASSWORD=123</code>：给root账户设置默认密码为<code>123</code></li>
+</ul>
+<h3 id="9-2-4-修改配置"><a href="#9-2-4-修改配置" class="headerlink" title="9.2.4.修改配置"></a>9.2.4.修改配置</h3><p>自定义配置文件：</p>
+<pre class="language-none"><code class="language-none">vi conf&#x2F;my.cnf</code></pre>
+
+<p>然后添加下面内容：</p>
+<pre class="language-none"><code class="language-none">[mysqld]
+skip-name-resolve
+character_set_server&#x3D;utf8
+datadir&#x3D;&#x2F;var&#x2F;lib&#x2F;mysql
+server-id&#x3D;1000</code></pre>
+
+<p>**==注意==**：按下<code>i</code>键，进入编辑模式后，再复制内容进去！</p>
+<p>重启mysql：</p>
+<pre class="language-none"><code class="language-none">docker restart ly-mysql</code></pre>
+
+
+
+<h3 id="9-2-5-测试连接"><a href="#9-2-5-测试连接" class="headerlink" title="9.2.5.测试连接"></a>9.2.5.测试连接</h3><p>通过Navicat或其它工具，尝试连接mysql。</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200713095425432.png" alt="image-20200713095425432" loading="lazy"></p>
+<h2 id="9-3-安装Redis"><a href="#9-3-安装Redis" class="headerlink" title="9.3.安装Redis"></a>9.3.安装Redis</h2><h3 id="9-3-1-导入镜像"><a href="#9-3-1-导入镜像" class="headerlink" title="9.3.1.导入镜像"></a>9.3.1.导入镜像</h3><p>方案一：如果自己网络不错，直接下载：</p>
+<pre class="language-none"><code class="language-none">docker pull redis:5.0</code></pre>
+
+<p>方案二：如果网络不太行，可以用课前资料准备的镜像包<code>redis.tar</code>，首先上传到Linux虚拟机，然后执行命令，导入即可：</p>
+<pre class="language-none"><code class="language-none">docker load -i redis.tar</code></pre>
+
+<h3 id="9-3-2-挂载本地文件"><a href="#9-3-2-挂载本地文件" class="headerlink" title="9.3.2.挂载本地文件"></a>9.3.2.挂载本地文件</h3><p>然后进入leyou目录：</p>
+<pre class="language-none"><code class="language-none">cd &#x2F;home&#x2F;leyou</code></pre>
+
+<p>创建一个文件夹：</p>
+<pre class="language-none"><code class="language-none">mkdir redis
+cd redis
+mkdir data</code></pre>
+
+<p>创建redis 的配置文件：</p>
+<pre class="language-none"><code class="language-none">touch redis.conf</code></pre>
+
+<p>修改配置：</p>
+<pre class="language-none"><code class="language-none">vi redis.conf</code></pre>
+
+<p>在redis.conf中添加一些配置：</p>
+<pre class="language-yaml" data-language="yaml"><code class="language-yaml">databases 1
+dir /data
+appendonly yes
+appendfilename appendonly.aof
+appendfsync everysec
+auto<span class="token punctuation">-</span>aof<span class="token punctuation">-</span>rewrite<span class="token punctuation">-</span>percentage 100
+auto<span class="token punctuation">-</span>aof<span class="token punctuation">-</span>rewrite<span class="token punctuation">-</span>min<span class="token punctuation">-</span>size 64mb</code></pre>
+
+
+
+<h3 id="9-3-3-运行容器"><a href="#9-3-3-运行容器" class="headerlink" title="9.3.3.运行容器"></a>9.3.3.运行容器</h3><p>进入redis.conf所在目录，然后执行docker命令：</p>
+<pre class="language-none"><code class="language-none">docker run \
+ -p 6379:6379 \
+ --name redis \
+ -v $PWD&#x2F;redis.conf:&#x2F;usr&#x2F;local&#x2F;etc&#x2F;redis&#x2F;redis.conf \
+ -v $PWD&#x2F;data:&#x2F;data \
+ --privileged \
+ -d \
+ redis \
+ redis-server &#x2F;usr&#x2F;local&#x2F;etc&#x2F;redis&#x2F;redis.conf</code></pre>
+
+
+
+<p>安装完成后，可以再控制台执行命令测试：</p>
+<pre class="language-none"><code class="language-none">docker exec -it ly-redis redis-cli</code></pre>
+
+<p>可以进入Redis控制台：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200713100051057.png" alt="image-20200713100051057" loading="lazy"></p>
+<h2 id="9-4-安装RabbitMQ"><a href="#9-4-安装RabbitMQ" class="headerlink" title="9.4.安装RabbitMQ"></a>9.4.安装RabbitMQ</h2><h3 id="9-4-1-准备镜像"><a href="#9-4-1-准备镜像" class="headerlink" title="9.4.1.准备镜像"></a>9.4.1.准备镜像</h3><p>可以使用命令自己拉取，或者使用课前资料中提供好的镜像资料<code>mq.tar</code>并导入。导入命令：</p>
+<pre class="language-none"><code class="language-none">docker load -i mq.tar</code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200713100444257.png" alt="image-20200713100444257" loading="lazy"></p>
+<h3 id="9-4-2-运行容器"><a href="#9-4-2-运行容器" class="headerlink" title="9.4.2.运行容器"></a>9.4.2.运行容器</h3><p>执行下面的命令来运行MQ容器：</p>
+<pre class="language-none"><code class="language-none">docker run \
+ -e RABBITMQ_DEFAULT_USER&#x3D;leyou \
+ -e RABBITMQ_DEFAULT_PASS&#x3D;123321 \
+ --name mq \
+ --hostname mq1 \
+ -p 15672:15672 \
+ -p 5672:5672 \
+ -d \
+ rabbitmq:3-management</code></pre>
+
+
+
+<h3 id="9-4-3-测试连接"><a href="#9-4-3-测试连接" class="headerlink" title="9.4.3.测试连接"></a>9.4.3.测试连接</h3><p>在浏览器访问：<a href="http://youIp:15672，例如我的是：http://192.168.150.101:15672">http://youIp:15672，例如我的是：http://192.168.150.101:15672</a></p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200713100655932.png" alt="image-20200713100655932" loading="lazy"></p>
+<h2 id="9-5-安装Elasticsearch"><a href="#9-5-安装Elasticsearch" class="headerlink" title="9.5.安装Elasticsearch"></a>9.5.安装Elasticsearch</h2><h3 id="9-5-1-准备镜像"><a href="#9-5-1-准备镜像" class="headerlink" title="9.5.1.准备镜像"></a>9.5.1.准备镜像</h3><p>因为es镜像过大，大家下载很慢，直接上传资料中提供的镜像<code>es7.tar</code>即可，命令：</p>
+<pre class="language-none"><code class="language-none">docker load -i es7.tar</code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200713101001928.png" alt="image-20200713101001928" loading="lazy"></p>
+<h3 id="9-5-2-准备数据卷"><a href="#9-5-2-准备数据卷" class="headerlink" title="9.5.2.准备数据卷"></a>9.5.2.准备数据卷</h3><p>虽然是docker运行，但是ES的数据和日志一定要在宿主机中，可以使用逻辑卷挂载运行，我们准备用三个逻辑卷：</p>
+<ul>
+<li>es-data：代表es的数据目录</li>
+<li>es-logs：代表es的日志目录</li>
+<li>es-plugins：代表es的插件目录</li>
+</ul>
+<p>可以现在使用<code>docker volume create</code>命令创建这些数据卷，也可以不创建，运行容器时自动创建。</p>
+<h3 id="9-5-3-运行容器"><a href="#9-5-3-运行容器" class="headerlink" title="9.5.3.运行容器"></a>9.5.3.运行容器</h3><p>运行命令如下：</p>
+<pre class="language-none"><code class="language-none">docker run --name es \
+    -e &quot;cluster.name&#x3D;elastic-cluster&quot; \
+    -e &quot;http.host&#x3D;0.0.0.0&quot; \
+    -e &quot;ES_JAVA_OPTS&#x3D;-Xms512m -Xmx512m&quot; \
+    -e &quot;discovery.type&#x3D;single-node&quot; \
+    -v es-data:&#x2F;usr&#x2F;share&#x2F;elasticsearch&#x2F;data \
+    -v es-logs:&#x2F;usr&#x2F;share&#x2F;elasticsearch&#x2F;logs \
+    -v es-plugins:&#x2F;usr&#x2F;share&#x2F;elasticsearch&#x2F;plugins \
+    --privileged \
+    -p 9200:9200 \
+    -p 9300:9300 \
+    --network my-net \
+    -d \
+    es7</code></pre>
+
+<p>命令解释：</p>
+<ul>
+<li><code>-e &quot;cluster.name=es-docker-cluster&quot;</code>：设置集群名称</li>
+<li><code>-e &quot;http.host=0.0.0.0&quot;</code>：监听的地址，可以外网访问</li>
+<li><code>-e &quot;ES_JAVA_OPTS=-Xms512m -Xmx512m&quot;</code>：内存大小</li>
+<li><code>-e &quot;discovery.type=single-node&quot;</code>：非集群模式</li>
+<li><code>-v es-data:/usr/share/elasticsearch/data</code>：挂载逻辑卷，绑定es的数据目录</li>
+<li><code>-v es-logs:/usr/share/elasticsearch/logs</code>：挂载逻辑卷，绑定es的日志目录</li>
+<li><code>-v es-plugins:/usr/share/elasticsearch/plugins</code>：挂载逻辑卷，绑定es的插件目录</li>
+<li><code>--privileged</code>：授予逻辑卷访问权</li>
+<li><code>-p 9200:9200</code>：端口映射配置</li>
+</ul>
+<h3 id="9-5-4-测试"><a href="#9-5-4-测试" class="headerlink" title="9.5.4.测试"></a>9.5.4.测试</h3><p>尝试在浏览器访问：<a href="http://192.168.150.101:9200查看效果：">http://192.168.150.101:9200查看效果：</a></p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/image-20200109155129995.png" alt="image-20200109155129995" loading="lazy"> </p>
+<h1 id="10-总结"><a href="#10-总结" class="headerlink" title="10.总结"></a>10.总结</h1><p>docker中有关镜像、容器等的命令，一幅图即可概况：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/1571023657710.png" alt="1571023657710" loading="lazy"></p>
+<p>镜像操作：</p>
+<pre class="language-none"><code class="language-none">docker build # 构建镜像
+docker images # 查看镜像
+docker rmi # 删除镜像
+docker search # 到仓库搜索镜像
+docker push # 提交镜像到仓库
+docker pull # 从仓库拉取镜像
+docker save # 保存镜像
+docker load # 加载本地镜像</code></pre>
+
+<p>容器操作：</p>
+<pre class="language-none"><code class="language-none">docker run&#x2F;exec&#x2F;attach # 运行镜像、进入已经启动镜像
+docker stop # 停止镜像
+docker start # 启动镜像
+docker pause # 暂停镜像
+docker unpause # 恢复镜像
+docker ps # 查看运行中的镜像
+docker rm # 删除镜像</code></pre>
+
+
+
+
+
+
+
+
+
+<p>完整docker命令：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/%E6%8A%80%E6%9C%AF/Docker%E5%85%A5%E9%97%A8/1542112444492.png" alt="1542112444492" loading="lazy">    </p>
+<pre class="language-shell" data-language="shell"><code class="language-shell">attach    Attach to a running container           <span class="token comment"># 当前 shell 下 attach 连接指定运行镜像</span>
+build     Build an image from a Dockerfile            <span class="token comment"># 通过 Dockerfile 定制镜像</span>
+commit    Create a new image from a container changes   <span class="token comment"># 提交当前容器为新的镜像</span>
+<span class="token function">cp</span>        Copy files/folders from the containers filesystem to the <span class="token function">host</span> path   <span class="token comment">#从容器中拷贝指定文件或者目录到宿主机中</span>
+create    Create a new container                    <span class="token comment"># 创建一个新的容器，同 run，但不启动容器</span>
+<span class="token function">diff</span>      Inspect changes on a container's filesystem   <span class="token comment"># 查看 docker 容器变化</span>
+events    Get real <span class="token function">time</span> events from the server          <span class="token comment"># 从 docker 服务获取容器实时事件</span>
+<span class="token builtin class-name">exec</span>      Run a <span class="token builtin class-name">command</span> <span class="token keyword">in</span> an existing container        <span class="token comment"># 在已存在的容器上运行命令</span>
+<span class="token builtin class-name">export</span>    Stream the contents of a container as a <span class="token function">tar</span> archive   <span class="token comment"># 导出容器的内容流作为一个 tar 归档文件[对应 import ]</span>
+<span class="token function">history</span>   Show the <span class="token function">history</span> of an image                  <span class="token comment"># 展示一个镜像形成历史</span>
+images    List images                                   <span class="token comment"># 列出系统当前镜像</span>
+<span class="token function">import</span>    Create a new filesystem image from the contents of a tarball <span class="token comment"># 从tar包中的内容创建一个新的文件系统映像[对应export]</span>
+info      Display system-wide information               <span class="token comment"># 显示系统相关信息</span>
+inspect   Return low-level information on a container   <span class="token comment"># 查看容器详细信息</span>
+<span class="token function">kill</span>      Kill a running container                      <span class="token comment"># kill 指定 docker 容器</span>
+load      Load an image from a <span class="token function">tar</span> archive         <span class="token comment"># 从一个 tar 包中加载一个镜像[对应 save]</span>
+login     Register or Login to the docker registry serve <span class="token comment"># 注册或者登陆一个 docker 源服务器</span>
+<span class="token builtin class-name">logout</span>    Log out from a Docker registry server          <span class="token comment"># 从当前 Docker registry 退出</span>
+logs      Fetch the logs of a container                 <span class="token comment"># 输出当前容器日志信息</span>
+port      Lookup the public-facing port <span class="token function">which</span> is NAT-ed to PRIVATE_PORT    <span class="token comment"># 查看映射端口对应的容器内部源端口</span>
+pause     Pause all processes within a container        <span class="token comment"># 暂停容器</span>
+<span class="token function">ps</span>        List containers                               <span class="token comment"># 列出容器列表</span>
+pull      Pull an image or a repository from the docker registry server   <span class="token comment"># 从docker镜像源服务器拉取指定镜像或者库镜像</span>
+push      Push an image or a repository to the docker registry server    <span class="token comment"># 推送指定镜像或者库镜像至docker源服务器</span>
+restart   Restart a running container                   <span class="token comment"># 重启运行的容器</span>
+<span class="token function">rm</span>        Remove one or <span class="token function">more</span> containers                 <span class="token comment"># 移除一个或者多个容器</span>
+rmi       Remove one or <span class="token function">more</span> images             <span class="token comment"># 移除一个或多个镜像[无容器使用该镜像才可删除，否则需删除相关容器才可继续或 -f 强制删除]</span>
+run       Run a <span class="token builtin class-name">command</span> <span class="token keyword">in</span> a new container              <span class="token comment"># 创建一个新的容器并运行一个命令</span>
+save      Save an image to a <span class="token function">tar</span> archive            <span class="token comment"># 保存一个镜像为一个 tar 包[对应 load]</span>
+search    Search <span class="token keyword">for</span> an image on the Docker Hub         <span class="token comment"># 在 docker hub 中搜索镜像</span>
+start     Start a stopped containers                    <span class="token comment"># 启动容器</span>
+stop      Stop a running containers                     <span class="token comment"># 停止容器</span>
+tag       Tag an image into a repository                <span class="token comment"># 给源中镜像打标签</span>
+<span class="token function">top</span>       Lookup the running processes of a container   <span class="token comment"># 查看容器中运行的进程信息</span>
+unpause   Unpause a paused container                    <span class="token comment"># 取消暂停容器</span>
+version   Show the docker version information           <span class="token comment"># 查看 docker 版本号</span>
+<span class="token function">wait</span>      Block <span class="token keyword">until</span> a container stops, <span class="token keyword">then</span> print its <span class="token builtin class-name">exit</span> <span class="token comment"># 截取容器停止时的退出状态值</span></code></pre>
+
+
+
+
+
+
+
+
+
+
+
+</div><div id="reward-container"><span class="hty-icon-button button-glow" id="reward-button" title="打赏" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === &quot;none&quot;) ? &quot;block&quot; : &quot;none&quot;;"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-hand-coin-line"></use></svg></span><div id="reward-comment">我很可爱，请给我钱</div><div id="qr" style="display:none;"><div style="display:inline-block"><a target="_blank" rel="noopener" href="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/medias/reward/alipay.jpg"><img loading="lazy" src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/medias/reward/alipay.jpg" alt="支付宝" title="支付宝"></a><div><span style="color:#00A3EE"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-alipay-line"></use></svg></span></div></div><div style="display:inline-block"><a target="_blank" rel="noopener" href="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/medias/reward/wechat.png"><img loading="lazy" src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/medias/reward/wechat.png" alt="微信支付" title="微信支付"></a><div><span style="color:#2DC100"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-wechat-pay-line"></use></svg></span></div></div></div></div><ul class="post-copyright"><li class="post-copyright-author"><strong>本文作者：</strong>xinzhu</li><li class="post-copyright-link"><strong>本文链接：</strong><a href="https://xinzhu37.github.io/note/skill/docker%E5%85%A5%E9%97%A8/" title="Docker入门">https://xinzhu37.github.io/note/skill/docker%E5%85%A5%E9%97%A8/</a></li><li class="post-copyright-license"><strong>版权声明：</strong>本博客所有文章除特别声明外，均默认采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener" title="CC BY-NC-SA 4.0 "><svg class="icon"><use xlink:href="#icon-creative-commons-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-by-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-nc-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-sa-line"></use></svg></a> 许可协议。</li></ul></section></article><div class="post-nav"><div class="post-nav-item"><a class="post-nav-prev" href="/note/skill/git-using-study-command/" rel="prev" title="Git的使用之命令"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-arrow-left-s-line"></use></svg><span class="post-nav-text">Git的使用之命令</span></a></div><div class="post-nav-item"><a class="post-nav-next" href="/note/skill/Spring%20Data%20JPA%E5%AE%9E%E7%8E%B0%EF%BC%88%E5%A4%9A%E6%9D%A1%E4%BB%B6%EF%BC%89%E5%88%86%E9%A1%B5%E6%9F%A5%E8%AF%A2/" rel="next" title="Spring Data JPA实现（多条件）分页查询"><span class="post-nav-text">Spring Data JPA实现（多条件）分页查询</span><svg class="icon" aria-hidden="true"><use xlink:href="#icon-arrow-right-s-line"></use></svg></a></div></div></div><div class="hty-card" id="comment"><div class="comment-tooltip text-center"><span>如果您有任何关于博客内容的相关讨论，欢迎前往 <a href="https://github.com/xinzhu37/xinzhu37.github.io/issues" target="_blank">GitHub issues</a> 与我交流。</span><br></div></div></main><footer class="sidebar-translate" id="footer"><div class="copyright"><span>&copy; 2020 – 2022 </span><span class="with-love" id="animate"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-cloud-line"></use></svg></span><span class="author"> xinzhu</span></div><div class="powered"><span>由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动 v5.4.0</span><span class="footer-separator">|</span><span>主题 - <a rel="noopener" href="https://github.com/YunYouJun/hexo-theme-yun" target="_blank"><span>Yun</span></a> v1.6.1</span></div><div class="live_time"><span>本博客已运行</span><span id="display_live_time"></span><span class="moe-text">(●'◡'●)</span><script>function blog_live_time() {
+  setTimeout(blog_live_time, 1000);
+  const start = new Date('2020-09-30T00:00:00');
+  const now = new Date();
+  const timeDiff = (now.getTime() - start.getTime());
+  const msPerMinute = 60 * 1000;
+  const msPerHour = 60 * msPerMinute;
+  const msPerDay = 24 * msPerHour;
+  const passDay = Math.floor(timeDiff / msPerDay);
+  const passHour = Math.floor((timeDiff % msPerDay) / 60 / 60 / 1000);
+  const passMinute = Math.floor((timeDiff % msPerHour) / 60 / 1000);
+  const passSecond = Math.floor((timeDiff % msPerMinute) / 1000);
+  display_live_time.innerHTML = " " + passDay + " 天 " + passHour + " 小时 " + passMinute + " 分 " + passSecond + " 秒";
+}
+blog_live_time();
+</script></div></footer><a class="hty-icon-button" id="back-to-top" aria-label="back-to-top" href="#"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-arrow-up-s-line"></use></svg><svg class="progress-circle-container" viewBox="0 0 100 100"><circle class="progress-circle" id="progressCircle" cx="50" cy="50" r="48" fill="none" stroke="#0078E7" stroke-width="2" stroke-linecap="round"></circle></svg></a></div></body></html>

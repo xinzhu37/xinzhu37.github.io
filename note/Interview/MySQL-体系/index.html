@@ -1,0 +1,752 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#0078E7"><meta name="author" content="xinzhu"><meta name="copyright" content="xinzhu"><meta name="generator" content="Hexo 5.4.0"><meta name="theme" content="hexo-theme-yun"><title>MySQL体系 | 心竹的小镇</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@900&amp;display=swap" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/star-markdown-css@0.1.25/dist/yun/yun-markdown.min.css"><script src="//at.alicdn.com/t/font_1140697_dxory92pb0h.js" async></script><script src="https://cdn.jsdelivr.net/npm/scrollreveal/dist/scrollreveal.min.js" defer></script><script>document.addEventListener("DOMContentLoaded", () => {
+  [".post-card",".post-content img"].forEach((target)=> {
+    ScrollReveal().reveal(target);
+  })
+});
+</script><link id="light-prism-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@latest/themes/prism.css" media="(prefers-color-scheme: light)"><link id="dark-prism-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@latest/themes/prism-tomorrow.css" media="(prefers-color-scheme: dark)"><link rel="icon" href="/yun.svg"><link rel="mask-icon" href="/yun.svg" color="#0078E7"><link rel="alternate icon" href="/yun.ico"><link rel="preload" href="/css/hexo-theme-yun.css" as="style"><link rel="preload" href="/js/utils.js" as="script"><link rel="preload" href="/js/hexo-theme-yun.js" as="script"><link rel="prefetch" href="/js/sidebar.js" as="script"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><script id="yun-config">
+    const Yun = window.Yun || {};
+    window.CONFIG = {"hostname":"xinzhu37.github.io","root":"/","title":"心竹君的小站","version":"1.6.1","mode":"auto","copycode":true,"page":{"isPost":true},"i18n":{"placeholder":"搜索...","empty":"找不到您查询的内容: ${query}","hits":"找到 ${hits} 条结果","hits_time":"找到 ${hits} 条结果（用时 ${time} 毫秒）"},"anonymous_image":"https://cdn.jsdelivr.net/gh/YunYouJun/cdn/img/avatar/none.jpg","say":{"api":"https://el-bot-api.vercel.app/api/words/young"},"fireworks":{"colors":["102, 167, 221","62, 131, 225","33, 78, 194"]}};
+  </script><link rel="stylesheet" href="/css/hexo-theme-yun.css"><script src="/js/utils.js"></script><script src="/js/hexo-theme-yun.js"></script><link rel="alternate" href="/atom.xml" title="心竹的小镇" type="application/atom+xml"><link rel="preconnect" href="https://www.google-analytics.com" crossorigin><script async src="https://www.googletagmanager.com/gtag/js?id=G-1LL0D86CY9"></script><script>if (CONFIG.hostname === location.hostname) {
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-1LL0D86CY9');
+}</script><script data-ad-client="ca-pub-2245427233262012" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><script>(function(){
+  var bp = document.createElement('script');
+  var curProtocol = window.location.protocol.split(':')[0];
+  if (curProtocol === 'https') {
+    bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+  }
+  else {
+    bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+  }
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(bp, s);
+})();</script><!-- Google Tag Manager --><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-M9KWR9L');</script><!-- End Google Tag Manager --><meta name="description" content="第一章 mysql简介1、mysql概述MySQL 是一个关系型数据库管理系统，由瑞典 MySQL AB 公司开发，目前属于 Oracle 公司。MySQL 是一种关联数据库管理系统，关联数据库将数据保存在不同的表中，而不是将所有数据放在一个大仓库内，这样就增加了速度并提高了灵活性。  MySQL 是开源的，目前隶属于 Oracle 旗下产品。 MySQL 支持大型的数据库。可以处理拥有上千万条记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL体系">
+<meta property="og:url" content="https://xinzhu37.github.io/note/Interview/MySQL-%E4%BD%93%E7%B3%BB/index.html">
+<meta property="og:site_name" content="心竹的小镇">
+<meta property="og:description" content="第一章 mysql简介1、mysql概述MySQL 是一个关系型数据库管理系统，由瑞典 MySQL AB 公司开发，目前属于 Oracle 公司。MySQL 是一种关联数据库管理系统，关联数据库将数据保存在不同的表中，而不是将所有数据放在一个大仓库内，这样就增加了速度并提高了灵活性。  MySQL 是开源的，目前隶属于 Oracle 旗下产品。 MySQL 支持大型的数据库。可以处理拥有上千万条记">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114160806263.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210315094242951.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114164316281.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114170938592.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114215204497.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114215810760.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114215833090.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114215907532.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114220058083.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114220119676.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114220208564.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114220232005.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114220248075.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114220838969.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114221018567.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114221417413.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114221608487.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114221650695.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114222006749.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114222021107.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114222035954.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114222709893.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114222759640.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210116164139013.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210116164408566.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210116165028573.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/20190929160358334.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210116170758216.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/slow_log1.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/slow_log2.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210116173444086.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210116174159127.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117153104867.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117153407361.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201222006330.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117154953591.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117155417455.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117155606616.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117160107883.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117160235029.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117160335652.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117160444118.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117160752846.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117161044767.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117161335863.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117162857227.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117163034038.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117163132917.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201233900198.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201224633451.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117164206076.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117164443010.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201234232334.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201234322355.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117164755120.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201234508773.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117170555988.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117170640459.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117170709697.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117170754854.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117170806482.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201232305310.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201232556575.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201233016445.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201235242682.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210202000238990.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210202000255372.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210202000743113.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210202001121669.png">
+<meta property="og:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/1598535511423.png">
+<meta property="article:published_time" content="2021-06-16T02:02:00.000Z">
+<meta property="article:modified_time" content="2021-06-16T06:03:20.000Z">
+<meta property="article:author" content="xinzhu">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="SQL优化">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114160806263.png"><script src="/js/ui/mode.js"></script></head><body><script defer src="https://cdn.jsdelivr.net/npm/animejs@latest"></script><script defer src="/js/ui/fireworks.js"></script><canvas class="fireworks"></canvas><div class="container"><a class="sidebar-toggle hty-icon-button" id="menu-btn"><div class="hamburger hamburger--spin" type="button"><span class="hamburger-box"><span class="hamburger-inner"></span></span></div></a><div class="sidebar-toggle sidebar-overlay"></div><aside class="sidebar"><script src="/js/sidebar.js"></script><ul class="sidebar-nav"><li class="sidebar-nav-item sidebar-nav-toc hty-icon-button sidebar-nav-active" data-target="post-toc-wrap" title="文章目录"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-list-ordered"></use></svg></li><li class="sidebar-nav-item sidebar-nav-overview hty-icon-button" data-target="site-overview-wrap" title="站点概览"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-passport-line"></use></svg></li></ul><div class="sidebar-panel" id="site-overview-wrap"><div class="site-info fix-top"><a class="site-author-avatar" href="/about/" title="xinzhu"><img width="96" loading="lazy" src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/medias/avatar.png" alt="xinzhu"><span class="site-author-status" title="Looking for dawn.">🌑</span></a><div class="site-author-name"><a href="/about/">xinzhu</a></div><a class="site-name" href="/about/site.html">心竹的小镇</a><sub class="site-subtitle">Nostalgia for a foreign country trip</sub><div class="site-desciption">希望能成为一个有趣的人</div></div><nav class="site-state"><a class="site-state-item hty-icon-button icon-home" href="/" title="首页"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-home-4-line"></use></svg></span></a><div class="site-state-item"><a href="/archives/" title="归档"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-archive-line"></use></svg></span><span class="site-state-item-count">30</span></a></div><div class="site-state-item"><a href="/categories/" title="分类"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-folder-2-line"></use></svg></span><span class="site-state-item-count">10</span></a></div><div class="site-state-item"><a href="/tags/" title="标签"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-price-tag-3-line"></use></svg></span><span class="site-state-item-count">38</span></a></div><a class="site-state-item hty-icon-button" href="/about/#comment" title="留言板"><span class="site-state-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-clipboard-line"></use></svg></span></a></nav><hr style="margin-bottom:0.5rem"><div class="links-of-author"><a class="links-of-author-item hty-icon-button" rel="noopener" href="/atom.xml" title="RSS" target="_blank" style="color:orange"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-rss-line"></use></svg></a><a class="links-of-author-item hty-icon-button" rel="noopener" href="tencent://AddContact/?fromId=50&amp;fromSubId=1&amp;subcmd=all&amp;uin=1148573442" title="QQ 1148573442" target="_blank" style="color:#12B7F5"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-qq-line"></use></svg></a><a class="links-of-author-item hty-icon-button" rel="noopener" href="https://github.com/xinzhu37" title="GitHub" target="_blank" style="color:#6e5494"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-github-line"></use></svg></a><a class="links-of-author-item hty-icon-button" rel="noopener" href="https://music.163.com/#/my/m/music/playlist?id=2038166981" title="网易云音乐" target="_blank" style="color:#C20C0C"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-netease-cloud-music-line"></use></svg></a><a class="links-of-author-item hty-icon-button" rel="noopener" href="mailto:gfz0307@163.com" title="E-Mail" target="_blank" style="color:#8E71C1"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-mail-line"></use></svg></a></div><hr style="margin:0.5rem 1rem"><div class="links"><a class="links-item hty-icon-button" href="/links/" title="我的小伙伴们" style="color:dodgerblue"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-genderless-line"></use></svg></a></div><br><a class="links-item hty-icon-button" id="toggle-mode-btn" href="javascript:;" title="Mode" style="color: #f1cb64"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-contrast-2-line"></use></svg></a></div><div class="sidebar-panel sidebar-panel-active" id="post-toc-wrap"><div class="post-toc"><div class="post-toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E7%AB%A0-mysql%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">第一章 mysql简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81mysql%E6%A6%82%E8%BF%B0"><span class="toc-number">1.1.</span> <span class="toc-text">1、mysql概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81sql%E4%BC%98%E5%8C%96"><span class="toc-number">1.2.</span> <span class="toc-text">2、为什么要sql优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81%E9%80%9A%E7%94%A8%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BC%98%E5%8C%96"><span class="toc-number">1.3.</span> <span class="toc-text">3、通用数据库优化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E7%AB%A0-mysql%E7%B4%A2%E5%BC%95"><span class="toc-number">2.</span> <span class="toc-text">第二章 mysql索引</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E4%BB%80%E4%B9%88%E6%98%AF%E7%B4%A2%E5%BC%95"><span class="toc-number">2.1.</span> <span class="toc-text">1、什么是索引</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81%E7%B4%A2%E5%BC%95%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.2.</span> <span class="toc-text">2、索引底层实现</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%901%E3%80%91%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91"><span class="toc-number">2.2.1.</span> <span class="toc-text">【1】平衡二叉树</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%902%E3%80%91B-%E6%A0%91"><span class="toc-number">2.2.2.</span> <span class="toc-text">【2】B-树</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%902-1%E3%80%91%E6%9F%A5%E8%AF%A2"><span class="toc-number">2.2.2.1.</span> <span class="toc-text">【2.1】查询</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%902-2%E3%80%91%E6%8F%92%E5%85%A5"><span class="toc-number">2.2.2.2.</span> <span class="toc-text">【2.2】插入</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%902-3%E3%80%91%E5%88%A0%E9%99%A4"><span class="toc-number">2.2.2.3.</span> <span class="toc-text">【2.3】删除</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%903%E3%80%91B-%E6%A0%91"><span class="toc-number">2.2.3.</span> <span class="toc-text">【3】B+树</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%903-1%E3%80%91%E5%8D%95%E8%A1%8C%E6%9F%A5%E8%AF%A2"><span class="toc-number">2.2.3.1.</span> <span class="toc-text">【3.1】单行查询</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%903-2%E3%80%91%E5%8C%BA%E9%97%B4%E6%9F%A5%E8%AF%A2"><span class="toc-number">2.2.3.2.</span> <span class="toc-text">【3.2】区间查询</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%903-2%E3%80%91%E6%8F%92%E5%85%A5%E5%92%8C%E5%88%A0%E9%99%A4"><span class="toc-number">2.2.3.3.</span> <span class="toc-text">【3.2】插入和删除</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81%E7%B4%A2%E5%BC%95%E7%9A%84%E5%88%86%E7%B1%BB"><span class="toc-number">2.3.</span> <span class="toc-text">3、索引的分类</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%901%E3%80%91%E4%B8%BB%E9%94%AE%E7%B4%A2%E5%BC%95"><span class="toc-number">2.3.1.</span> <span class="toc-text">【1】主键索引</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%902%E3%80%91%E5%8D%95%E5%80%BC%E7%B4%A2%E5%BC%95"><span class="toc-number">2.3.2.</span> <span class="toc-text">【2】单值索引</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%903%E3%80%91%E5%94%AF%E4%B8%80%E7%B4%A2%E5%BC%95"><span class="toc-number">2.3.3.</span> <span class="toc-text">【3】唯一索引</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%904%E3%80%91%E5%A4%8D%E5%90%88%E7%B4%A2%E5%BC%95"><span class="toc-number">2.3.4.</span> <span class="toc-text">【4】复合索引</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E3%80%81%E6%9C%80%E5%B7%A6%E5%8C%B9%E9%85%8D%E5%8E%9F%E5%88%99"><span class="toc-number">2.4.</span> <span class="toc-text">4、最左匹配原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5%E3%80%81%E7%B4%A2%E5%BC%95%E6%93%8D%E4%BD%9C"><span class="toc-number">2.5.</span> <span class="toc-text">5、索引操作</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%901%E3%80%91%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="toc-number">2.5.1.</span> <span class="toc-text">【1】基本操作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%902%E3%80%91%E7%B4%A2%E5%BC%95%E6%B5%8B%E8%AF%95"><span class="toc-number">2.5.2.</span> <span class="toc-text">【2】索引测试</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6%E3%80%81%E7%B4%A2%E5%BC%95%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="toc-number">2.6.</span> <span class="toc-text">6、索引优缺点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7%E3%80%81%E7%B4%A2%E5%BC%95%E7%9A%84%E9%80%89%E6%8B%A9"><span class="toc-number">2.7.</span> <span class="toc-text">7、索引的选择</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%901%E3%80%91%E5%93%AA%E4%BA%9B%E6%83%85%E5%86%B5%E9%9C%80%E8%A6%81%E5%88%9B%E5%BB%BA%E7%B4%A2%E5%BC%95"><span class="toc-number">2.7.1.</span> <span class="toc-text">【1】哪些情况需要创建索引</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%902%E3%80%91%E5%93%AA%E4%BA%9B%E6%83%85%E5%86%B5%E4%B8%8D%E8%A6%81%E5%88%9B%E5%BB%BA%E7%B4%A2%E5%BC%95"><span class="toc-number">2.7.2.</span> <span class="toc-text">【2】哪些情况不要创建索引</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E7%AB%A0-%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8ESQL%E4%BC%98%E5%8C%96%E3%80%90%E9%87%8D%E7%82%B9%E3%80%91"><span class="toc-number">3.</span> <span class="toc-text">第三章 执行计划与SQL优化【重点】</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="toc-number">3.1.</span> <span class="toc-text">1、性能分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%901%E3%80%91%E6%85%A2%E6%9F%A5%E8%AF%A2%E5%88%86%E6%9E%90"><span class="toc-number">3.1.1.</span> <span class="toc-text">【1】慢查询分析</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%901-1%E3%80%91%E4%BB%80%E4%B9%88%E6%98%AF%E6%85%A2%E6%9F%A5%E8%AF%A2%E6%97%A5%E5%BF%97"><span class="toc-number">3.1.1.1.</span> <span class="toc-text">【1.1】什么是慢查询日志</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%901-2%E3%80%91%E6%9F%A5%E7%9C%8B%E6%85%A2%E6%9F%A5%E8%AF%A2%E9%85%8D%E7%BD%AE"><span class="toc-number">3.1.1.2.</span> <span class="toc-text">【1.2】查看慢查询配置</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%901-3%E3%80%91%E4%BF%AE%E6%94%B9%E6%85%A2%E6%9F%A5%E8%AF%A2%E9%85%8D%E7%BD%AE"><span class="toc-number">3.1.1.3.</span> <span class="toc-text">【1.3】修改慢查询配置</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%901-4%E3%80%91%E8%AE%BE%E7%BD%AE%E6%85%A2%E6%9F%A5%E8%AF%A2%E9%98%88%E5%80%BC"><span class="toc-number">3.1.1.4.</span> <span class="toc-text">【1.4】设置慢查询阈值</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%901-5%E3%80%91%E6%85%A2%E6%9F%A5%E8%AF%A2%E5%88%86%E6%9E%90"><span class="toc-number">3.1.1.5.</span> <span class="toc-text">【1.5】慢查询分析</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%902%E3%80%91Explain-%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92"><span class="toc-number">3.1.2.</span> <span class="toc-text">【2】Explain (执行计划)</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%902-1%E3%80%91%E6%A6%82%E5%BF%B5%E5%8F%8A%E4%BD%9C%E7%94%A8"><span class="toc-number">3.1.2.1.</span> <span class="toc-text">【2.1】概念及作用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%902-2%E3%80%91%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="toc-number">3.1.2.2.</span> <span class="toc-text">【2.2】使用方法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%902-3%E3%80%91%E5%8F%82%E6%95%B0%E8%AF%A6%E8%A7%A3"><span class="toc-number">3.1.2.3.</span> <span class="toc-text">【2.3】参数详解</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E3%80%902-3-1%E3%80%91id%E3%80%90%E9%87%8D%E8%A6%81%E3%80%91"><span class="toc-number">3.1.2.3.1.</span> <span class="toc-text">【2.3.1】id【重要】</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E3%80%902-3-2%E3%80%91select-type"><span class="toc-number">3.1.2.3.2.</span> <span class="toc-text">【2.3.2】select_type</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E3%80%902-3-3%E3%80%91table"><span class="toc-number">3.1.2.3.3.</span> <span class="toc-text">【2.3.3】table</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E3%80%902-3-4%E3%80%91partitions"><span class="toc-number">3.1.2.3.4.</span> <span class="toc-text">【2.3.4】partitions</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E3%80%902-3-5%E3%80%91possible-keys"><span class="toc-number">3.1.2.3.5.</span> <span class="toc-text">【2.3.5】possible_keys</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E3%80%902-3-6%E3%80%91type%E3%80%90%E9%87%8D%E8%A6%81%E3%80%91"><span class="toc-number">3.1.2.3.6.</span> <span class="toc-text">【2.3.6】type【重要】</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E3%80%902-3-7%E3%80%91key%E3%80%90%E9%87%8D%E8%A6%81%E3%80%91"><span class="toc-number">3.1.2.3.7.</span> <span class="toc-text">【2.3.7】key【重要】</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E3%80%902-3-8%E3%80%91key-len"><span class="toc-number">3.1.2.3.8.</span> <span class="toc-text">【2.3.8】key_len</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E3%80%902-3-9%E3%80%91ref"><span class="toc-number">3.1.2.3.9.</span> <span class="toc-text">【2.3.9】ref</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E3%80%902-3-10%E3%80%91rows"><span class="toc-number">3.1.2.3.10.</span> <span class="toc-text">【2.3.10】rows</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E3%80%902-3-11%E3%80%91filtered"><span class="toc-number">3.1.2.3.11.</span> <span class="toc-text">【2.3.11】filtered</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E3%80%902-3-12%E3%80%91Extra"><span class="toc-number">3.1.2.3.12.</span> <span class="toc-text">【2.3.12】Extra</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81SQL%E4%BC%98%E5%8C%96"><span class="toc-number">3.2.</span> <span class="toc-text">2、SQL优化</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%901%E3%80%91%E9%81%BF%E5%85%8D%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88"><span class="toc-number">3.2.1.</span> <span class="toc-text">【1】避免索引失效</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%901-1%E3%80%91%E5%85%A8%E5%80%BC%E5%8C%B9%E9%85%8D"><span class="toc-number">3.2.1.1.</span> <span class="toc-text">【1.1】全值匹配</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%901-2%E3%80%91%E6%9C%80%E5%B7%A6%E5%8C%B9%E9%85%8D%E5%8E%9F%E5%88%99"><span class="toc-number">3.2.1.2.</span> <span class="toc-text">【1.2】最左匹配原则</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%901-3%E3%80%91%E8%8C%83%E5%9B%B4%E6%9D%A1%E4%BB%B6%E5%8F%B3%E8%BE%B9%E7%9A%84%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88"><span class="toc-number">3.2.1.3.</span> <span class="toc-text">【1.3】范围条件右边的索引失效</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%901-4%E3%80%91%E4%B8%8D%E5%86%8D%E7%B4%A2%E5%BC%95%E5%88%97%E4%B8%8A%E5%81%9A%E4%BB%BB%E4%BD%95%E6%93%8D%E4%BD%9C"><span class="toc-number">3.2.1.4.</span> <span class="toc-text">【1.4】不再索引列上做任何操作</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%901-5%E3%80%91%E4%BD%BF%E7%94%A8-%E6%88%96%E8%80%85-lt-gt-%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88"><span class="toc-number">3.2.1.5.</span> <span class="toc-text">【1.5】使用(!&#x3D;或者&lt;&gt;)索引失效</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%901-6%E3%80%91is-not-null%E6%97%A0%E6%B3%95%E4%BD%BF%E7%94%A8%E7%B4%A2%E5%BC%95"><span class="toc-number">3.2.1.6.</span> <span class="toc-text">【1.6】is not null无法使用索引</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%901-7%E3%80%91like%E4%BB%A5%E9%80%9A%E9%85%8D%E7%AC%A6%E5%BC%80%E5%A4%B4-qw-%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88"><span class="toc-number">3.2.1.7.</span> <span class="toc-text">【1.7】like以通配符开头(%qw)索引失效</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%901-8%E3%80%91%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%8D%E5%8A%A0%E5%BC%95%E5%8F%B7%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88"><span class="toc-number">3.2.1.8.</span> <span class="toc-text">【1.8】字符串不加引号索引失效</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%901-9%E3%80%91%E4%BD%BF%E7%94%A8or%E8%BF%9E%E6%8E%A5%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88"><span class="toc-number">3.2.1.9.</span> <span class="toc-text">【1.9】使用or连接索引失效</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%901-10%E3%80%91%E5%B0%BD%E9%87%8F%E4%BD%BF%E7%94%A8%E8%A6%86%E7%9B%96%E7%B4%A2%E5%BC%95"><span class="toc-number">3.2.1.10.</span> <span class="toc-text">【1.10】尽量使用覆盖索引</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%902%E3%80%91%E6%8E%92%E5%BA%8F%E4%B8%8E%E5%88%86%E7%BB%84%E4%BC%98%E5%8C%96"><span class="toc-number">3.2.2.</span> <span class="toc-text">【2】排序与分组优化</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%902-1%E3%80%91%E6%97%A0-Using-filesort%E7%9A%84%E6%83%85%E5%86%B5"><span class="toc-number">3.2.2.1.</span> <span class="toc-text">【2.1】无 Using filesort的情况</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%902-2%E3%80%91%E6%9C%89-Using-filesort%E7%9A%84%E6%83%85%E5%86%B5"><span class="toc-number">3.2.2.2.</span> <span class="toc-text">【2.2】有 Using filesort的情况</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%903%E3%80%91%E5%A4%A7%E6%95%B0%E6%8D%AE%E9%87%8F%E5%88%86%E9%A1%B5%E4%BC%98%E5%8C%96"><span class="toc-number">3.2.3.</span> <span class="toc-text">【3】大数据量分页优化</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%903-1%E3%80%91%E4%BD%BF%E7%94%A8%E5%AD%90%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96"><span class="toc-number">3.2.3.1.</span> <span class="toc-text">【3.1】使用子查询优化</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%903-2%E3%80%91%E4%BD%BF%E7%94%A8id%E9%99%90%E5%AE%9A%E6%96%B9%E6%A1%88"><span class="toc-number">3.2.3.2.</span> <span class="toc-text">【3.2】使用id限定方案</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%904%E3%80%91%E5%B0%8F%E8%A1%A8%E9%A9%B1%E5%8A%A8%E5%A4%A7%E8%A1%A8"><span class="toc-number">3.2.4.</span> <span class="toc-text">【4】小表驱动大表</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%904-1%E3%80%91%E8%A1%A8%E5%85%B3%E8%81%94%E6%9F%A5%E8%AF%A2"><span class="toc-number">3.2.4.1.</span> <span class="toc-text">【4.1】表关联查询</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E3%80%904-2%E3%80%91in%E5%92%8Cexits%E6%9F%A5%E8%AF%A2"><span class="toc-number">3.2.4.2.</span> <span class="toc-text">【4.2】in和exits查询</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E3%80%905%E3%80%91max%E5%87%BD%E6%95%B0%E4%BC%98%E5%8C%96"><span class="toc-number">3.2.5.</span> <span class="toc-text">【5】max函数优化</span></a></li></ol></li></ol></li></ol></div></div></div></aside><main class="sidebar-translate" id="content"><div id="post"><article class="hty-card post-block" itemscope itemtype="https://schema.org/Article"><link itemprop="mainEntityOfPage" href="https://xinzhu37.github.io/note/Interview/MySQL-%E4%BD%93%E7%B3%BB/"><span hidden itemprop="author" itemscope itemtype="https://schema.org/Person"><meta itemprop="name" content="xinzhu"><meta itemprop="description"></span><span hidden itemprop="publisher" itemscope itemtype="https://schema.org/Organization"><meta itemprop="name" content="心竹的小镇"></span><header class="post-header"><h1 class="post-title" itemprop="name headline">MySQL体系<a class="post-edit-link" href="null_posts/note/Interview/MySQL-体系.md" target="_blank" title="编辑" rel="noopener"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-edit-line"></use></svg></a></h1><div class="post-meta"><div class="post-time" style="display:inline-block"><span class="post-meta-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-calendar-line"></use></svg></span> <time title="创建时间：2021-06-16 10:02:00" itemprop="dateCreated datePublished" datetime="2021-06-16T10:02:00+08:00">2021-06-16</time></div><div class="post-classify"><span class="post-category"> <span class="post-meta-item-icon" style="margin-right:3px;"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-folder-line"></use></svg></span><span itemprop="about" itemscope itemtype="https://schema.org/Thing"><a class="category-item" href="/categories/%E9%9D%A2%E8%AF%95/" style="--text-color:var(--hty-text-color)" itemprop="url" rel="index"><span itemprop="text">面试</span></a></span></span><span class="post-tag"><span class="post-meta-divider">-</span><a class="tag-item" href="/tags/MySQL/" style="--text-color:var(--hty-text-color)"><span class="post-meta-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-price-tag-3-line"></use></svg></span><span class="tag-name">MySQL</span></a><a class="tag-item" href="/tags/SQL%E4%BC%98%E5%8C%96/" style="--text-color:var(--hty-text-color)"><span class="post-meta-item-icon"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-price-tag-3-line"></use></svg></span><span class="tag-name">SQL优化</span></a></span></div><div class="post-author"><span class="author-name">xinzhu</span></div></div></header><section class="post-body" itemprop="articleBody"><div class="post-content markdown-body" style="--smc-primary:#0078E7;"><h2 id="第一章-mysql简介"><a href="#第一章-mysql简介" class="headerlink" title="第一章 mysql简介"></a>第一章 mysql简介</h2><h3 id="1、mysql概述"><a href="#1、mysql概述" class="headerlink" title="1、mysql概述"></a>1、mysql概述</h3><p>MySQL 是一个关系型数据库管理系统，由瑞典 MySQL AB 公司开发，目前属于 Oracle 公司。MySQL 是一种关联数据库管理系统，关联数据库将数据保存在不同的表中，而不是将所有数据放在一个大仓库内，这样就增加了速度并提高了灵活性。</p>
+<ul>
+<li>MySQL 是开源的，目前隶属于 Oracle 旗下产品。</li>
+<li>MySQL 支持大型的数据库。可以处理拥有上千万条记录的大型数据库。</li>
+<li>MySQL 使用标准的 SQL 数据语言形式。</li>
+<li>MySQL 可以运行于多个系统上，并且支持多种语言。编程语言包括 C、C++、Python、Java、Perl、PHP、Eiffel、Ruby 和 Tcl 等。</li>
+<li>MySQL 对PHP有很好的支持，PHP 是目前最流行的 Web 开发语言。</li>
+<li>MySQL ==支持大型数据库，支持 5000 万条记录的数据仓库，32 位系统表文件最大可支持 4GB，64 位系统支持最大的表文件为8TB。==</li>
+<li>MySQL 是可以定制的，采用了 GPL 协议，你可以修改源码来开发自己的 MySQL 系统。</li>
+<li><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114160806263.png" alt="first" loading="lazy"></li>
+<li>​</li>
+</ul>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210315094242951.png" alt="Alt text" loading="lazy"></p>
+<p>MyISAM 和 InnoDB 是最常见的两种存储引擎，特点如下。</p>
+<p><strong>MyISAM 存储引擎</strong></p>
+<p>MyISAM 是 MySQL 官方提供默认的存储引擎，其特点是==不支持事务、表锁和全文索引==，对于一些 OLAP（联机</p>
+<p>分析处理）系统，操作速度快。</p>
+<p>每个 MyISAM 在磁盘上存储成三个文件。文件名都和表名相同，</p>
+<p>扩展名分别是</p>
+<p>==.frm（存储表定义）、==</p>
+<p>==.MYD (MYData，存储数据)、===</p>
+<p>==.MYI (MYIndex，存储索引)==</p>
+<p>这里特别要注意的是 MyISAM 不缓存数据文件，只缓存索引文件。</p>
+<p><strong>InnoDB 存储引擎</strong></p>
+<p>InnoDB 存储引擎==支持事务==，主要面向 OLTP（联机事务处理过程）方面的应用，其特点是行锁设置、支持外键，</p>
+<p>并支持类似于 Oracle 的非锁定读，即默认情况下读不产生锁。InnoDB 将数据放在一个逻辑表空间中。InnoDB 通过多版本并发控制来获得高并发性，实现了 ANSI 标准的 4 种隔离级别，默认为 可重复读【Repeatable】，使用一种被称为 next-key locking 的策略避免幻读。</p>
+<h3 id="2、为什么要sql优化"><a href="#2、为什么要sql优化" class="headerlink" title="2、为什么要sql优化"></a>2、为什么要sql优化</h3><p>​        在应用开发的过程中，由于前期数据量少，开发人员编写的SQL语句或者数据库整体解决方案都更重视在功能上的实现， 但是当应用系统正式上线后，随着生成数据量的急剧增长，很多SQL语句和数据库整体方案开始逐渐显露出了性 能问题，对生成的影响也越来越大，此时Mysql数据库的性能问题成为系统应用的瓶颈，因此需要进行Mysql数据库的性能优化。</p>
+<p>性能下降的表现</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties">慢查询造成页面无法加载
+阻塞造成数据无法提交</code></pre>
+
+<p>性能下降的原因</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties">查询语句写的不好，各种连接，各种子查询导致用不上索引或者没有建立索引，胡乱建立索引
+<span class="token attr-name">建立的索引失效，建立了索引,在真正执行时,没有用上建立的索引</span> <span class="token attr-value">select * from order select id from order</span>
+<span class="token attr-name">关联查询太多join</span> 
+<span class="token attr-name">服务器调优及配置参数导致，如果设置的不合理,比例不恰当,也会导致性能下降,sql变慢</span> 
+系统架构的问题</code></pre>
+
+<h3 id="3、通用数据库优化"><a href="#3、通用数据库优化" class="headerlink" title="3、通用数据库优化"></a>3、通用数据库优化</h3><p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114164316281.png" alt="Alt text" loading="lazy"></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_29677867/article/details/90048086">https://blog.csdn.net/qq_29677867/article/details/90048086</a></p>
+<p>SQL及索引优化</p>
+<ul>
+<li>根据需求写出良好的SQL，并创建有效的索引，实现某一种需求可以多种写法，我们就要选择一种效率最高的写法，这个时候就要了解sql优化。</li>
+<li>sql优化的目的之一就是减少中间结果集，降低物理IO</li>
+</ul>
+<p>数据库表结构优化</p>
+<ul>
+<li>根据数据库的范式，设计表结构，表结构设计的好坏直接关系到SQL语句的复杂度。</li>
+<li>适当的将表进行拆分，原本需要join的查询只需要一张单表查询就可以了。</li>
+<li>合理的分库、分表</li>
+</ul>
+<p>系统配置优化</p>
+<ul>
+<li>大多数运行在Linux机器上，如tcp连接数的限制、打开文件数的限制、安全性的限制，因此我们要对这些配置进行相应的优化</li>
+</ul>
+<p>硬件优化</p>
+<ul>
+<li>数据库主机的IO性能是需要最优先考虑的一个因素</li>
+<li>数据库主机和普通的应用程序服务器相比，资源要相对集中很多，单台主机上所需要进行的计算量自然也就比较多，所以数据库主机的CPU处理能力也是一个重要的因素。</li>
+<li>数据库主机网络设备（一般指网卡等）的性能也可能会成为系统的瓶颈。</li>
+</ul>
+<h2 id="第二章-mysql索引"><a href="#第二章-mysql索引" class="headerlink" title="第二章 mysql索引"></a>第二章 mysql索引</h2><h3 id="1、什么是索引"><a href="#1、什么是索引" class="headerlink" title="1、什么是索引"></a>1、什么是索引</h3><p>简介</p>
+<p>​        索引是对数据库表中一列或多列的值进行排序的一种结构，使用索引可快速访问数据库表中的特定信息。</p>
+<p>举例说明索引：如果把数据库中的某一张看成一本书，那么索引就像是书的目录，可以通过目录快速查找书中指定内容的位置，对于数据库表来说，可以通过索引快速查找表中的数据。</p>
+<p><strong>工作原理</strong></p>
+<p>​        索引一般以文件形式存在磁盘中（也可以存于内存中），存储的索引的原理大致概括为以空间换时间，数据库在未添加索引的时候进行查询默认的是进行全量搜索，也就是进行全局扫描，有多少条数据就要进行多少次查询，然后找到相匹配的数据就把他放到结果集中，直到全表扫描完。而建立索引之后，会将建立索引的KEY值放在一个n叉树上（BTree）。因为B树的特点就是适合在磁盘等直接存储设备上组织动态查找表，每次以索引进行条件查询时，会去树上根据key值直接进行搜索。</p>
+<h3 id="2、索引底层实现"><a href="#2、索引底层实现" class="headerlink" title="2、索引底层实现"></a>2、索引底层实现</h3><h4 id="【1】平衡二叉树"><a href="#【1】平衡二叉树" class="headerlink" title="【1】平衡二叉树"></a>【1】平衡二叉树</h4><p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114170938592.png" alt="Alt text" loading="lazy"></p>
+<p>左边表示的是某个数据库的数据表，一共有两列七条记录，最左边的是数据记录的物理地址（就是在硬盘的存储位置）。为了加快对Col2这一列的查找，可以创建一个如右边所示的二叉查找树，每个节点分别包含索引键值和一个指向对应数据记录物理地址的指针，这样就可以运用二叉查找在O(log2n)的复杂度内获取到相应数据。</p>
+<p>比如这样的一个查询</p>
+<pre class="language-none"><code class="language-none">select * from tablename where Col2&#x3D;5</code></pre>
+
+<p>这时候会先从Col2=34的根节点开始找,因为5小于34，会进入到左边的编号位22的子节点,依次向下推，就会找到Col2=5，这样就比用5和Col2中的每个数字来对比下要快的多了。</p>
+<h4 id="【2】B-树"><a href="#【2】B-树" class="headerlink" title="【2】B-树"></a>【2】B-树</h4><p>一个m阶的B树具有如下几个特征：B树中所有结点的孩子结点最大值称为B树的阶，通常用m表示。一个结点有k个孩子时，必有k-1个关键字才能将子树中所有关键字划分为k个子集。</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties">根结点至少有两个子女。
+<span class="token attr-name">每个中间节点都包含k-1个元素和k个孩子，其中</span> <span class="token attr-value">m/2 &lt;= k &lt;= m</span>
+所有的叶子结点都位于同一层。
+每个节点中的元素从小到大排列，节点当中k-1个元素正好是k个孩子包含的元素的值域分划。</code></pre>
+
+<p>示例：三阶B树（实际中节点中元素很多） </p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114215204497.png" alt="image-20210114215204497" loading="lazy"></p>
+<p>这颗树中，我们重点看【2，6】节点，此节点有二个元素2和6，有三个孩子1，【3，5】，8。其中1小于元素2，【3，5】在原始2，6之间，8大于【3，5】，符合上面的几条特征</p>
+<h5 id="【2-1】查询"><a href="#【2-1】查询" class="headerlink" title="【2.1】查询"></a>【2.1】查询</h5><p>以上图为例：若查询的数值为５：<br>第一次磁盘IO：在内存中与9比较</p>
+<p>​        <img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114215810760.png" alt="image-20210114215810760" loading="lazy">第二次磁盘IO：在内存（与2，6）比较</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114215833090.png" alt="image-20210114215833090" loading="lazy"></p>
+<p>第三次磁盘ＩＯ：在内存中定位（与3、5比较），找到5，终止。 </p>
+<p>整个<img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114215907532.png" alt="image-20210114215907532" loading="lazy">过程中，我们可以看出：比较的次数并不比二叉查找树少，尤其某一节点中的数据很多时，但是磁盘IO的次数却是大大减少。比较是在内存中进行的，相比于磁盘IO的速度，比较的耗时几乎可以忽略。所以当树的高度足够低的话，就可以极大的提高效率。相比之下，节点中的元素多点也没关系，仅仅是多了几次内存交互而已，只要不超过磁盘页的大小即可。</p>
+<h5 id="【2-2】插入"><a href="#【2-2】插入" class="headerlink" title="【2.2】插入"></a>【2.2】插入</h5><p>我们插入一个4，自顶向下查找4的节点位置，发现4应当插入到节点元素3，5之间。</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114220058083.png" alt="image-20210114220058083" loading="lazy"></p>
+<p>节点3，5已经是两元素节点，无法再增加。父亲节点 2， 6 也是两元素节点，也无法再增加。根节点9是单元素节点，可以升级为两元素节点。于是拆分节点3，5与节点2，6，让根节点9升级为两元素节点4，9。节点6独立为根节点的第二个孩子。</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114220119676.png" alt="image-20210114220119676" loading="lazy"></p>
+<h5 id="【2-3】删除"><a href="#【2-3】删除" class="headerlink" title="【2.3】删除"></a>【2.3】删除</h5><p>我们删除11，自顶向下查找元素11的节点位置。</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114220208564.png" alt="image-20210114220208564" loading="lazy"></p>
+<p>删除11后，节点12只有一个孩子，不符合B树规范。因此找出12,13,15三个节点的中位数13，取代节点12，而节点12自身下移成为第一个孩子。（这个过程称为左旋）</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114220232005.png" alt="image-20210114220232005" loading="lazy"></p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114220248075.png" alt="image-20210114220248075" loading="lazy"></p>
+<h4 id="【3】B-树"><a href="#【3】B-树" class="headerlink" title="【3】B+树"></a>【3】B+树</h4><p>Ｂ＋树是Ｂ树的变种，有着比Ｂ树更高的查询效率。一个m阶的B+树具有如下几个特征</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties">有k个子树的中间节点包含有k个元素（B树中是k-1个元素），每个元素不保存数据，只用来索引，所有数据都保存在叶子节点。
+所有的叶子结点中包含了全部元素的信息，及指向含这些元素记录的指针，且叶子结点本身依关键字的大小自小而大顺序链接。
+所有的中间节点元素都同时存在于子节点，在子节点元素中是最大（或最小）元素。</code></pre>
+
+<p>下面是一棵3阶的B+树： </p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114220838969.png" alt="image-20210114220838969" loading="lazy"></p>
+<p>首先每个父节点都出现在子节点中【是子节点的最大或最小元素】</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114221018567.png" alt="image-20210114221018567" loading="lazy"></p>
+<p>根节点元素15是子节点11，15的最大元素，也是叶子节点13，15的最大元素，需要注意的是，跟节点的最大元素，也就的沟通与整个B+树的最大元素，以后无论插入删除多少元素，始终要保存最大元素在跟节点中，值与叶子节点，由于父节点总的所有元素都出现在子节点，因此所有叶子节点包含所有元素，并且叶子节点形成有序链表</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114221417413.png" alt="image-20210114221417413" loading="lazy"></p>
+<p>B数中卫星数据：指的是索引元素指向的数据记录，比如数据库的某一行，在B树中面无论中间节点还是叶子节点都带有卫星数据：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114221608487.png" alt="image-20210114221608487" loading="lazy"></p>
+<p>二在B+树中，只有叶子节点带有卫星数据，其余中间节点仅仅是索引：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114221650695.png" alt="image-20210114221650695" loading="lazy"></p>
+<p>需要补充的是，在数据库的聚集索引（Clustered Index）中，叶子节点直接包含卫星数据。在非聚集索引（NonClustered Index）中，叶子节点带有指向卫星数据的指针。</p>
+<h5 id="【3-1】单行查询"><a href="#【3-1】单行查询" class="headerlink" title="【3.1】单行查询"></a>【3.1】单行查询</h5><p>比如查找3这个数字</p>
+<p>第一次磁盘IO：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114222006749.png" alt="image-20210114222006749" loading="lazy"></p>
+<p>第二次IO：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114222021107.png" alt="image-20210114222021107" loading="lazy"></p>
+<p>第三次IO：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114222035954.png" alt="image-20210114222035954" loading="lazy"></p>
+<p>【注意】：看似和B树相同，但是二者有本质的区别：</p>
+<p>​        首先B+树的中间节点没有卫星数据面所以同样大小的磁盘页可用存储更多的节点数据，</p>
+<p>​        其次,B+树查询最终都是找到叶子节点，二B树只要找到元素即可，无论匹配的元素处于中间还是叶子节点，所以B树不稳定。</p>
+<h5 id="【3-2】区间查询"><a href="#【3-2】区间查询" class="headerlink" title="【3.2】区间查询"></a>【3.2】区间查询</h5><p>查找3到11中的所有数据节点</p>
+<p>B树中序遍历</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114222709893.png" alt="image-20210114222709893" loading="lazy"></p>
+<p>B+树，链表遍历：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210114222759640.png" alt="image-20210114222759640" loading="lazy"></p>
+<h5 id="【3-2】插入和删除"><a href="#【3-2】插入和删除" class="headerlink" title="【3.2】插入和删除"></a>【3.2】插入和删除</h5><p>　 B+树的插入与B树的插入过程类似。不同的是B+树在叶结点上进行，如果叶结点中的关键码个数超过m，就必须分裂成关键码数目大致相同的两个结点，并保证上层结点中有这两个结点的最大关键码。</p>
+<p>​    B+树中的关键码在叶结点层删除后，其在上层的复本可以保留，作为一个”分解关键码”存在，如果因为删除而造成结点中关键码数小于ceil(m/2)，其处理过程与B-树的处理一样。在此，我就不多做介绍了。</p>
+<h3 id="3、索引的分类"><a href="#3、索引的分类" class="headerlink" title="3、索引的分类"></a>3、索引的分类</h3><h4 id="【1】主键索引"><a href="#【1】主键索引" class="headerlink" title="【1】主键索引"></a>【1】主键索引</h4><p>设定为主键后数据库会自动建立索引，innodb为聚簇索引</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment">#随表一起建索引：</span>
+<span class="token comment">#使用AUTO_INCREMENT关键字的列必须有索引(只要有索引就行)。</span>
+<span class="token attr-name">CREATE</span> <span class="token attr-value">TABLE customer (</span>
+<span class="token attr-name">    id</span> <span class="token attr-value">INT(10) UNSIGNED  AUTO_INCREMENT ,</span>
+<span class="token attr-name">    customer_no</span> <span class="token attr-value">VARCHAR(200),</span>
+<span class="token attr-name">    customer_name</span> <span class="token attr-value">VARCHAR(200),</span>
+<span class="token attr-name">    PRIMARY</span> <span class="token attr-value">KEY(id) </span>
+);
+<span class="token comment">#追加修改索引</span>
+<span class="token attr-name">CREATE</span> <span class="token attr-value">TABLE customer2 (</span>
+<span class="token attr-name">    id</span> <span class="token attr-value">INT(10) UNSIGNED,</span>
+<span class="token attr-name">    customer_no</span> <span class="token attr-value">VARCHAR(200),</span>
+<span class="token attr-name">    customer_name</span> <span class="token attr-value">VARCHAR(200),</span>
+<span class="token attr-name">	PRIMARY</span> <span class="token attr-value">KEY(id) </span>
+);
+<span class="token comment">#删除建主键索引：</span>
+<span class="token attr-name">ALTER</span> <span class="token attr-value">TABLE customer drop PRIMARY KEY ;  </span>
+<span class="token comment">#单独建主键索引：</span>
+<span class="token attr-name">ALTER</span> <span class="token attr-value">TABLE customer add PRIMARY KEY customer(customer_no);  </span>
+<span class="token comment">#修改建主键索引：</span>
+<span class="token comment">#必须先删除掉(drop)原索引，再新建(add)索引</span></code></pre>
+
+<h4 id="【2】单值索引"><a href="#【2】单值索引" class="headerlink" title="【2】单值索引"></a>【2】单值索引</h4><p>即一个索引只包含单个列，一个表可以有多个单列索引</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment">#随表一起建索引：</span>
+<span class="token attr-name">CREATE</span> <span class="token attr-value">TABLE customer (</span>
+<span class="token attr-name">	id</span> <span class="token attr-value">INT(10) UNSIGNED  AUTO_INCREMENT ,</span>
+<span class="token attr-name">	customer_no</span> <span class="token attr-value">VARCHAR(200),</span>
+<span class="token attr-name">	customer_name</span> <span class="token attr-value">VARCHAR(200),</span>
+<span class="token attr-name">  	PRIMARY</span> <span class="token attr-value">KEY(id),</span>
+<span class="token attr-name">  	KEY</span> <span class="token attr-value">(customer_name)  </span>
+);
+
+<span class="token comment">#单独建单值索引：</span>
+<span class="token attr-name">CREATE</span> <span class="token attr-value">INDEX idx_customer_name ON customer(customer_name); </span>
+<span class="token comment">#删除索引：</span>
+<span class="token attr-name">DROP</span> <span class="token attr-value">INDEX idx_customer_name ;</span></code></pre>
+
+<h4 id="【3】唯一索引"><a href="#【3】唯一索引" class="headerlink" title="【3】唯一索引"></a>【3】唯一索引</h4><p>索引列的值必须唯一，但允许有空值</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment">#随表一起建索引：</span>
+<span class="token attr-name">CREATE</span> <span class="token attr-value">TABLE customer (</span>
+<span class="token attr-name">    id</span> <span class="token attr-value">INT(10) UNSIGNED  AUTO_INCREMENT ,</span>
+<span class="token attr-name">    customer_no</span> <span class="token attr-value">VARCHAR(200),</span>
+<span class="token attr-name">    customer_name</span> <span class="token attr-value">VARCHAR(200),</span>
+<span class="token attr-name">  	PRIMARY</span> <span class="token attr-value">KEY(id),</span>
+<span class="token attr-name">  	UNIQUE</span> <span class="token attr-value">(customer_no)</span>
+);
+<span class="token comment">#建立 唯一索引时必须保证所有的值是唯一的（除了null），若有重复数据，会报错。   </span>
+<span class="token comment">#单独建唯一索引：</span>
+<span class="token attr-name">CREATE</span> <span class="token attr-value">UNIQUE INDEX idx_customer_no ON customer(customer_no); </span>
+<span class="token comment">#删除索引：</span>
+<span class="token attr-name">DROP</span> <span class="token attr-value">INDEX idx_customer_no on customer ;</span></code></pre>
+
+<h4 id="【4】复合索引"><a href="#【4】复合索引" class="headerlink" title="【4】复合索引"></a>【4】复合索引</h4><p>即一个索引包含多个列</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment">#随表一起建索引：</span>
+<span class="token attr-name">CREATE</span> <span class="token attr-value">TABLE customer (</span>
+<span class="token attr-name">    id</span> <span class="token attr-value">INT(10) UNSIGNED  AUTO_INCREMENT ,</span>
+<span class="token attr-name">    customer_no</span> <span class="token attr-value">VARCHAR(200),</span>
+<span class="token attr-name">    customer_name</span> <span class="token attr-value">VARCHAR(200),</span>
+<span class="token attr-name">  	PRIMARY</span> <span class="token attr-value">KEY(id),</span>
+<span class="token attr-name">  	KEY</span> <span class="token attr-value">(customer_no,customer_name)</span>
+);
+
+<span class="token comment">#单独建索引：</span>
+<span class="token attr-name">CREATE</span> <span class="token attr-value">INDEX idx_no_name ON customer(customer_no,customer_name); </span>
+<span class="token comment">#删除索引：</span>
+<span class="token attr-name">DROP</span> <span class="token attr-value">INDEX idx_no_name  on customer ;</span></code></pre>
+
+<h3 id="4、最左匹配原则"><a href="#4、最左匹配原则" class="headerlink" title="4、最左匹配原则"></a>4、最左匹配原则</h3><p>==此原则只针对：复合索引==</p>
+<p>如：一张员工表，我们经常会用 工号、名称、入职日期 作为条件查询</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> 员工表 <span class="token keyword">where</span> 工号<span class="token operator">=</span><span class="token number">10002</span> <span class="token operator">and</span> 名称<span class="token operator">=</span>Staff <span class="token operator">and</span> 入职日期<span class="token operator">=</span><span class="token string">'2001-09-03'</span></code></pre>
+
+<p>那么我们可以考虑 将(工号、名称、入职日期)创建为一个组合索引</p>
+<p><strong>疑问: 那为什么我们不把 这三个字段都单独列一个索引呢？</strong></p>
+<p>主要是效率问题，对工号、名称、入职日期三列分别创建索引，MySQL只会选择辨识度高的一列作为索引。假设有100w的数据，一个索引筛选出10%的数据，那么可以筛选出10w的数据；对于组合索引而言： 如果将(工号、名称、入职日期)创建为一个组合索引，那么三个字段的筛选将都会使用上，先按工号排查、工号匹配完在按名称筛选、名称筛选完再按日期筛选，那么筛选的数据就是 100wX10%X10%X10%筛选出1000条数据。</p>
+<p><strong>最左原则：</strong></p>
+<pre class="language-java" data-language="java"><code class="language-java">（工号、名称、入职日期<span class="token punctuation">)</span> 作为一个组合索引，将会生成下图的索引目录结构。由接口可以看出，工号是最先需要判断的字段，所以工号这个查询条件必须存在工号判断完，才会判断名称名称判断完才会判断入职日期</code></pre>
+
+<p>也就是说，组合索引查询条件必须得带有最左边的列：对于我们的索引：<br>    条件为： （工号）   （工号，名称）   （工号，名称，入职日期） 这几种情况都是生效的<br>    条件为： （名称）不生效    （名称，入职日期）不生效  （工号，入职日期）部分生效</p>
+<h3 id="5、索引操作"><a href="#5、索引操作" class="headerlink" title="5、索引操作"></a>5、索引操作</h3><h4 id="【1】基本操作"><a href="#【1】基本操作" class="headerlink" title="【1】基本操作"></a>【1】基本操作</h4><pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment">#创建</span>
+<span class="token attr-name">ALTER</span> <span class="token attr-value">mytable ADD  [UNIQUE ]  INDEX [indexName] ON (columnname(length));</span>
+<span class="token comment">#删除</span>
+<span class="token attr-name">DROP</span> <span class="token attr-value">INDEX [indexName] ON mytable;</span>
+<span class="token comment">#查看</span>
+<span class="token attr-name">SHOW</span> <span class="token attr-value">INDEX FROM table_name;</span>
+<span class="token comment">#添加一个主键，这意味着索引值必须是唯一的，且不能为NULL。</span>
+<span class="token attr-name">ALTER</span> <span class="token attr-value">TABLE tbl_name ADD PRIMARY KEY (column_list);</span>
+<span class="token comment">#创建索引的值必须是唯一的（除了NULL外，NULL可能会出现多次）。</span>
+<span class="token attr-name">ALTER</span> <span class="token attr-value">TABLE tbl_name ADD UNIQUE index_name (column_list);</span>
+<span class="token comment">#添加普通索引，索引值可出现多次。</span>
+<span class="token attr-name">ALTER</span> <span class="token attr-value">TABLE tbl_name ADD INDEX index_name (column_list);</span>
+<span class="token comment">#该语句指定了索引为 FULLTEXT ，用于全文索引。</span>
+<span class="token attr-name">ALTER</span> <span class="token attr-value">TABLE tbl_name ADD FULLTEXT index_name (column_list);</span></code></pre>
+
+<h4 id="【2】索引测试"><a href="#【2】索引测试" class="headerlink" title="【2】索引测试"></a>【2】索引测试</h4><p>未添加索引</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token attr-name">select</span> <span class="token attr-value">cus_id from testemployee where cus_id=5;</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210116164139013.png" alt="image-20210116164139013" loading="lazy"></p>
+<p>添加索引</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token attr-name">create</span> <span class="token attr-value">index idx_cusid on testemployee(cus_id)</span></code></pre>
+
+<p>再执行查询</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token attr-name">select</span> <span class="token attr-value">cus_id from testemployee where cus_id=5;</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210116164408566.png" alt="image-20210116164408566" loading="lazy"></p>
+<h3 id="6、索引优缺点"><a href="#6、索引优缺点" class="headerlink" title="6、索引优缺点"></a>6、索引优缺点</h3><p> 索引的优点</p>
+<ul>
+<li>建立索引的列可以保证行的唯一性，生成唯一的rowId</li>
+<li>建立索引可以有效缩短数据的检索时间</li>
+<li>建立索引可以加快表与表之间的连接查询 left join  on  </li>
+<li>为用来排序或者是分组的字段添加索引可以加快分组和排序顺序</li>
+</ul>
+<p>索引的缺点</p>
+<ul>
+<li><p>创建索引和维护索引需要时间成本，这个成本随着数据量的增加而加大</p>
+</li>
+<li><p>创建索引和维护索引需要空间成本，每一条索引都要占据数据库的物理存储空间，数据量越大，占用空间也越大（数据表占据的是数据库的数据空间）</p>
+</li>
+<li><p>会降低表的增删改的效率，因为每次增删改索引需要进行动态维护，导致时间变长</p>
+</li>
+</ul>
+<h3 id="7、索引的选择"><a href="#7、索引的选择" class="headerlink" title="7、索引的选择"></a>7、索引的选择</h3><h4 id="【1】哪些情况需要创建索引"><a href="#【1】哪些情况需要创建索引" class="headerlink" title="【1】哪些情况需要创建索引"></a>【1】哪些情况需要创建索引</h4><ul>
+<li>主键自动建立唯一索引</li>
+<li>频繁作为查询条件的字段应该创建索引(where 后面的语句)</li>
+<li>查询中与其它表关联的字段，外键关系建立索引</li>
+<li>单键/组合索引的选择问题，who？(在高并发下倾向创建组合索引)</li>
+<li>查询中分组、排序的字段，排序字段若通过索引去访问将大大提高排序速度</li>
+<li>查询中统计或者分组字段</li>
+</ul>
+<h4 id="【2】哪些情况不要创建索引"><a href="#【2】哪些情况不要创建索引" class="headerlink" title="【2】哪些情况不要创建索引"></a>【2】哪些情况不要创建索引</h4><ul>
+<li>记录比较少，本身数据就少即使加上索引也不会有太大的提升，增删改时还需要对索引维护进行维护，反而增加了工作</li>
+<li>where条件里用不到的字段不建立索引，选择索引的时候不是越多越好</li>
+<li>经常增删改的表，索引提高了查询的速度，同时却会降低更新表的速度,因为建立索引后, 如果对表进行INSERT,UPDATE 和DELETE, MYSQL不仅要保存数据,还要保存一下索引文件</li>
+<li>数据重复的表字段如果某个数据列包含了许多重复的内容,为它建立索引  就没有太大在的实际效果，比如表中的某一个字段为国籍,性别，数据的差异率不高,这种建立索引就没有太多意义。</li>
+</ul>
+<h2 id="第三章-执行计划与SQL优化【重点】"><a href="#第三章-执行计划与SQL优化【重点】" class="headerlink" title="第三章 执行计划与SQL优化【重点】"></a>第三章 执行计划与SQL优化【重点】</h2><h3 id="1、性能分析"><a href="#1、性能分析" class="headerlink" title="1、性能分析"></a>1、性能分析</h3><h4 id="【1】慢查询分析"><a href="#【1】慢查询分析" class="headerlink" title="【1】慢查询分析"></a>【1】慢查询分析</h4><h5 id="【1-1】什么是慢查询日志"><a href="#【1-1】什么是慢查询日志" class="headerlink" title="【1.1】什么是慢查询日志"></a>【1.1】什么是慢查询日志</h5><p>​        mysql的慢查询日志是mysql提供的一种日志记录，它用来记录在mysql中响应时间超过阀值的语句,mysql 的日志是跟踪mysql性能瓶颈的最快和最直接的方式了，系统性能出现瓶颈的时候，首先要打开慢查询日志，进行跟踪，尽快的分析和排查出执行效率较慢的SQL ,及时解决避免造成不好的影响。<br>作用： 记录具体执行效率较低的SQL语句的日志信息。</p>
+<p>注意：<br>在默认情况下mysql的慢查询日志记录是关闭的。<br>同时慢查询日志默认不记录管理语句和不使用索引进行查询的语句</p>
+<h5 id="【1-2】查看慢查询配置"><a href="#【1-2】查看慢查询配置" class="headerlink" title="【1.2】查看慢查询配置"></a>【1.2】查看慢查询配置</h5><pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment">#查询慢查询配置信息</span>
+<span class="token attr-name">show</span> <span class="token attr-value">variables like '%quer%';</span>
+<span class="token comment">#查看慢查询是否开启</span>
+<span class="token attr-name">show</span> <span class="token attr-value">variables like '%slow_query_log%';</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210116165028573.png" alt="image-20210116165028573" loading="lazy"></p>
+<h5 id="【1-3】修改慢查询配置"><a href="#【1-3】修改慢查询配置" class="headerlink" title="【1.3】修改慢查询配置"></a>【1.3】修改慢查询配置</h5><p>修改mysql中的my.ini文件，关键代码如下图：</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/20190929160358334.png" alt="img" loading="lazy"></p>
+<p>==注意：需要重新启动mysql服务==</p>
+<h5 id="【1-4】设置慢查询阈值"><a href="#【1-4】设置慢查询阈值" class="headerlink" title="【1.4】设置慢查询阈值"></a>【1.4】设置慢查询阈值</h5><pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment">#设置慢查询阈值</span>
+<span class="token attr-name">set</span> <span class="token attr-value">global long_query_time=4;</span>
+<span class="token comment">#查看慢查询阈值</span>
+<span class="token attr-name">show</span> <span class="token attr-value">variables like 'long_query_time';</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210116170758216.png" alt="image-20210116170758216" loading="lazy"></p>
+<h5 id="【1-5】慢查询分析"><a href="#【1-5】慢查询分析" class="headerlink" title="【1.5】慢查询分析"></a>【1.5】慢查询分析</h5><ul>
+<li>统计不同慢sql的</li>
+<li>出现次数(Count)</li>
+<li>执行最长时间(Time)</li>
+<li>累计总耗费时间(Time)</li>
+<li>等待锁的时间(Lock)</li>
+<li>发送给客户端的行总数(Rows</li>
+<li>扫描的行总数(Rows)</li>
+<li>用户以及sql语句本身(抽象了一下格式, 比如 limit 1, 20 用 limit N,N 表示)</li>
+</ul>
+<p>==常用工具：mysqlsla，myprofi，pt-query-diges==</p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/slow_log1.png" alt="img" loading="lazy"></p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/slow_log2.png" alt="img" loading="lazy"></p>
+<h4 id="【2】Explain-执行计划"><a href="#【2】Explain-执行计划" class="headerlink" title="【2】Explain (执行计划)"></a>【2】Explain (执行计划)</h4><h5 id="【2-1】概念及作用"><a href="#【2-1】概念及作用" class="headerlink" title="【2.1】概念及作用"></a>【2.1】概念及作用</h5><p>​        使用explain关键字,可以模拟优化器执行的SQL语句从而知道MYSQL是如何处理sql语句的通过Explain可以分析查询语句或表结构的性能瓶颈</p>
+<pre class="language-none"><code class="language-none">查看表的读取顺序
+数据读取操作的操作类型
+查看哪些索引可以使用
+查看哪些索引被实际使用
+查看表之间的引用
+查看每张表有多少行被优化器执行</code></pre>
+
+<h5 id="【2-2】使用方法"><a href="#【2-2】使用方法" class="headerlink" title="【2.2】使用方法"></a>【2.2】使用方法</h5><p>使用Explain关键字 放到sql语句前</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment">#执行计划使用</span>
+<span class="token attr-name">explain</span> <span class="token attr-value">select cus_id from testemployee where cus_id > 10</span></code></pre>
+
+<h5 id="【2-3】参数详解"><a href="#【2-3】参数详解" class="headerlink" title="【2.3】参数详解"></a>【2.3】参数详解</h5><p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210116173444086.png" alt="image-20210116173444086" loading="lazy"></p>
+<h6 id="【2-3-1】id【重要】"><a href="#【2-3-1】id【重要】" class="headerlink" title="【2.3.1】id【重要】"></a>【2.3.1】id【重要】</h6><p>作用：Select查询的序列号，包含一组数字,表示查询中执行select子句或操作表的顺序，具体规则</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties">id值相同：执行顺序由上到下
+id不同：如果是子查询,id的序号会递增,id值越大优先级越高,优先被执行
+id相同不同同时存在：可以认为是一组,从上往下顺序执行</code></pre>
+
+<p>==在所有组中,id值越大,优先级越高,越先执行==</p>
+<p>id值相同：</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># id相同</span>
+<span class="token attr-name">EXPLAIN</span> <span class="token attr-value">SELECT * from employee e,department d,customer c where e.dep_id = d.id and e.cus_id = c.id;</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210116174159127.png" alt="image-20210116174159127" loading="lazy"></p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment">#id值不同	</span>
+<span class="token attr-name">EXPLAIN</span> <span class="token attr-value">SELECT * from department WHERE id = (SELECT id from employee WHERE id=(SELECT id from customer WHERE id = 1))</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117153104867.png" alt="image-20210117153104867" loading="lazy"></p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment">#id值相同不同都存在, deriverd 衍生出来的虚表</span>
+<span class="token attr-name">EXPLAIN</span> <span class="token attr-value">select * from department d, (select * from employee group by dep_id) t where d.id = t.dep_id;</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117153407361.png" alt="image-20210117153407361" loading="lazy"></p>
+<h6 id="【2-3-2】select-type"><a href="#【2-3-2】select-type" class="headerlink" title="【2.3.2】select_type"></a>【2.3.2】select_type</h6><p>作用：反应查询类型</p>
+<p>其取值：</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token attr-name">SIMPLE</span><span class="token punctuation">:</span>   <span class="token attr-value">简单select查询,查询中不包含子查询或者UNION</span>
+<span class="token attr-name">PRIMARY</span><span class="token punctuation">:</span>  <span class="token attr-value">查询中若包含任何复杂的子查询,最外层查询则被标记为primary</span>
+<span class="token attr-name">SUBQUERY</span><span class="token punctuation">:</span> <span class="token attr-value">在select或where中包含了子查询</span>
+<span class="token attr-name">DERIVED</span><span class="token punctuation">:</span>  <span class="token attr-value">在from列表中包含的子查询被标记为derived(衍生)把结果放在临时表当		</span>
+<span class="token attr-name">UNION</span><span class="token punctuation">:</span>    <span class="token attr-value">若第二个select出现的union之后,则被标记为union,若union包含在from子句的子查询中,外层select将被标记为deriver</span>
+<span class="token attr-name">UNION</span> <span class="token attr-value">RESULT:  从union表获取结果select,两个UNION合并的结果集在最后</span></code></pre>
+
+
+
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment">#union 和 union result 示例</span>
+<span class="token attr-name">EXPLAIN</span> <span class="token attr-value">select * from employee e LEFT JOIN department d on e.dep_id = d.id</span>
+<span class="token attr-name">UNION</span> 
+<span class="token attr-name">select</span> <span class="token attr-value">* from employee e RIGHT JOIN department D ON e.dep_id = d.id</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201222006330.png" alt="image-20210201222006330" loading="lazy"></p>
+<h6 id="【2-3-3】table"><a href="#【2-3-3】table" class="headerlink" title="【2.3.3】table"></a>【2.3.3】table</h6><p>作用：显示这一行的数据来源于哪张表</p>
+<h6 id="【2-3-4】partitions"><a href="#【2-3-4】partitions" class="headerlink" title="【2.3.4】partitions"></a>【2.3.4】partitions</h6><p>作用：如果查询是基于分区表的话, 会显示查询访问的分区</p>
+<h6 id="【2-3-5】possible-keys"><a href="#【2-3-5】possible-keys" class="headerlink" title="【2.3.5】possible_keys"></a>【2.3.5】possible_keys</h6><p>作用：显示可能应用在这张表中的索引,一个或者多个查询涉及到的字段上若存在索引,则该索引将被列出,但不一定被查询实际使用，<br>可能自己创建了4个索引,在执行的时候,可能根据内部的自动判断,只使用了3个</p>
+<h6 id="【2-3-6】type【重要】"><a href="#【2-3-6】type【重要】" class="headerlink" title="【2.3.6】type【重要】"></a>【2.3.6】type【重要】</h6><p> 访问类型排列：==system &gt; const &gt; eq_ref &gt; ref &gt; range &gt; index &gt; ALL==</p>
+<p>system </p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># system 表中有一行记录(系统表)  这是const类型的特例,平时不会出现</span>
+<span class="token attr-name">explain</span> <span class="token attr-value">select HOST from mysql.db where HOST='localhost'</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117154953591.png" alt="image-20210117154953591" loading="lazy"></p>
+<p>const </p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># const  表示通过索引一次就找到了，直接查询主键或者唯一索引，因为只匹配一行数据,所以很快</span>
+<span class="token attr-name">EXPLAIN</span> <span class="token attr-value">select id from employee where id=1</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117155417455.png" alt="image-20210117155417455" loading="lazy"></p>
+<p>eq_ref </p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># eq_ref 唯一性索引扫描 对于每个索引键,表中只有一条记录与之匹配, 常见于主键或唯一索引扫描</span>
+<span class="token attr-name">EXPLAIN</span> <span class="token attr-value">select * from employee e,department d where e.id=d.id</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117155606616.png" alt="image-20210117155606616" loading="lazy"></p>
+<p>ref</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># ref 非唯一性索引扫描,返回匹配某个单独值的所有行,本质上也是一种索引访问,它返回所有匹配某个单独值的行可能会找到多个符合条件的行,所以它应该属于查找和扫描的混合体</span>
+<span class="token attr-name">EXPLAIN</span> <span class="token attr-value">select e.id,e.dep_id,d.id from employee e,department d where e.dep_id = d.id</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117160107883.png" alt="image-20210117160107883" loading="lazy"></p>
+<p>range </p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># range 只检索给定范围的行,使用一个索引来选择行 一般就是在你的where语句中出现between\&lt;\>\ in等查询,这种范围扫描索引比全表扫描要好,因为它只需要开始于索引的某一点.而结束语另一点,不用扫描全部索引</span>
+<span class="token attr-name">explain</span> <span class="token attr-value">select * from employee where id>2</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117160235029.png" alt="image-20210117160235029" loading="lazy"></p>
+<p>index</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># index index与All区别为index类型只遍历索引树,通常比All要快,因为索引文件通常比数据文件要小all和index都是读全表,但index是从索引中读取,all是从硬盘当中读取</span>
+<span class="token attr-name">explain</span> <span class="token attr-value">select id from employee</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117160335652.png" alt="image-20210117160335652" loading="lazy"></p>
+<p>ALL</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># ALL 将全表进行扫描,从硬盘当中读取数据,如果出现了All 切数据量非常大, 一定要去做优化</span>
+<span class="token attr-name">explain</span> <span class="token attr-value">select * from employee</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117160444118.png" alt="image-20210117160444118" loading="lazy"></p>
+<h6 id="【2-3-7】key【重要】"><a href="#【2-3-7】key【重要】" class="headerlink" title="【2.3.7】key【重要】"></a>【2.3.7】key【重要】</h6><p>作用：实际使用的索引,如果为NULL,则没有使用索引,查询中若使用了覆盖索引 ,则该索引仅出现在key列表</p>
+<p>possible_keys与key关系,理论应该用到哪些索引  实际用到了哪些索引<br>覆盖索引 查询的字段和建立的字段刚好吻合,这种我们称为覆盖索引</p>
+<h6 id="【2-3-8】key-len"><a href="#【2-3-8】key-len" class="headerlink" title="【2.3.8】key_len"></a>【2.3.8】key_len</h6><p>作用：表示索引中使用的字节数,可通过该列计算查询中使用的索引长度 .</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># 表示索引中使用的字节数,可通过该列计算查询中使用的索引长度 .</span>
+<span class="token attr-name">explain</span> <span class="token attr-value">select * from employee where dep_id=1 and name='鲁班' and age=10</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117160752846.png" alt="image-20210117160752846" loading="lazy"></p>
+<h6 id="【2-3-9】ref"><a href="#【2-3-9】ref" class="headerlink" title="【2.3.9】ref"></a>【2.3.9】ref</h6><p>作用：索引是否被引入到, 到底引用到了哪几个索引</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># ref 索引是否被引入到, 到底引用到了哪几个索引</span>
+<span class="token attr-name">Explain</span> <span class="token attr-value">select * from employee e,department d where e.dep_id = d.id and e.cus_id = 1</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117161044767.png" alt="image-20210117161044767" loading="lazy"></p>
+<h6 id="【2-3-10】rows"><a href="#【2-3-10】rows" class="headerlink" title="【2.3.10】rows"></a>【2.3.10】rows</h6><p>作用：根据表统计信息及索引选用情况,大致估算出找到所需的记录所需要读取的行数,每长表有多少行被优化器查询过</p>
+<h6 id="【2-3-11】filtered"><a href="#【2-3-11】filtered" class="headerlink" title="【2.3.11】filtered"></a>【2.3.11】filtered</h6><pre class="language-mysql" data-language="mysql"><code class="language-mysql">-- 满足查询的记录数量的比例，注意是百分比，不是具体记录数 . 值越大越好，filtered列的值依赖统计信息，并不十分准确
+Explain select e.dep_id from employee e,department d where e.dep_id &#x3D; d.id</code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117161335863.png" alt="image-20210117161335863" loading="lazy"></p>
+<h6 id="【2-3-12】Extra"><a href="#【2-3-12】Extra" class="headerlink" title="【2.3.12】Extra"></a>【2.3.12】Extra</h6><p>作用：语句中出现了Using Filesort 和 Using Temporary说明没有使用到索引出现 impossible where说明条件永远不成立</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># Using filesort (需要优化)说明mysql会对数据使用一个外部的索引排序,而不是按照表内的索引顺序进行Mysql中无法利用索引完成排序操作称为"文件排序"	</span>
+<span class="token attr-name">explain</span> <span class="token attr-value">select * from employee where dep_id =1 ORDER BY cus_id</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117162857227.png" alt="image-20210117162857227" loading="lazy"></p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># Using temporary (需要优化)使用了临时表保存中间结果,Mysql在对查询结果排序时, 使用了临时表,常见于排序orderby 和分组查询group by</span>
+<span class="token attr-name">explain</span> <span class="token attr-value">select name from employee where dep_id in (1,2,3) GROUP BY cus_id</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117163034038.png" alt="image-20210117163034038" loading="lazy"></p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># impossible where (需要优化)where 子句的值总是false 不能用来获取任何元组	</span>
+<span class="token attr-name">explain</span> <span class="token attr-value">select name from employee where name='鲁班' and name='zs'</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117163132917.png" alt="image-20210117163132917" loading="lazy"></p>
+<h3 id="2、SQL优化"><a href="#2、SQL优化" class="headerlink" title="2、SQL优化"></a>2、SQL优化</h3><h4 id="【1】避免索引失效"><a href="#【1】避免索引失效" class="headerlink" title="【1】避免索引失效"></a>【1】避免索引失效</h4><ul>
+<li>最左匹配原则  </li>
+<li>范围条件右边的索引失效</li>
+<li>不再索引列上做任何操作 </li>
+<li>在使用(!=或者&lt;&gt;)索引失效</li>
+<li>is not null无法使用索引</li>
+<li>like以通配符开头(%qw)索引失效 </li>
+<li>字符串不加引号索引失效</li>
+<li>使用or连接索引失效</li>
+<li>尽量使用覆盖索引</li>
+</ul>
+<h5 id="【1-1】全值匹配"><a href="#【1-1】全值匹配" class="headerlink" title="【1.1】全值匹配"></a>【1.1】全值匹配</h5><pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># 创建组合索引</span>
+<span class="token attr-name">create</span> <span class="token attr-value">index idx_name_dep_age on employee(name,dep_id,age);</span>
+<span class="token comment"># 索引字段全部使用上</span>
+<span class="token attr-name">explain</span> <span class="token attr-value">select name,dep_id,age from employee where name='鲁班' and dep_id=1 and age=10</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201233900198.png" alt="image-20210201233900198" loading="lazy"></p>
+<h5 id="【1-2】最左匹配原则"><a href="#【1-2】最左匹配原则" class="headerlink" title="【1.2】最左匹配原则"></a>【1.2】最左匹配原则</h5><pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># 去掉name条件 索引全部失效</span>
+<span class="token attr-name">explain</span> <span class="token attr-value">select * from employee where dep_id=1 and age=10</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201224633451.png" alt="image-20210201224633451" loading="lazy"></p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># 去掉dep_id   name索引生效</span>
+<span class="token attr-name">explain</span> <span class="token attr-value">select * from employee where name='鲁班' and age=10</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117164206076.png" alt="image-20210117164206076" loading="lazy"></p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># 顺序错乱不会影响最左匹配</span>
+<span class="token attr-name">explain</span> <span class="token attr-value">select * from employee where dep_id=1 and  age=10 and name='鲁班' </span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117164443010.png" alt="image-20210117164443010" loading="lazy"></p>
+<h5 id="【1-3】范围条件右边的索引失效"><a href="#【1-3】范围条件右边的索引失效" class="headerlink" title="【1.3】范围条件右边的索引失效"></a>【1.3】范围条件右边的索引失效</h5><pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># 范围查找 会造成该组合索引字段的右侧索引全部失效</span>
+<span class="token attr-name">explain</span> <span class="token attr-value">select * from employee where  name = '鲁班' and dep_id>1 and age=10 </span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201234232334.png" alt="image-20210201234232334" loading="lazy"></p>
+<h5 id="【1-4】不再索引列上做任何操作"><a href="#【1-4】不再索引列上做任何操作" class="headerlink" title="【1.4】不再索引列上做任何操作"></a>【1.4】不再索引列上做任何操作</h5><pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># 在name字段上 加上去除空格的函数 索引失效</span>
+<span class="token attr-name">explain</span> <span class="token attr-value">select * from employee where TRIM(name)='鲁班' and dep_id=1 and age=10</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201234322355.png" alt="image-20210201234322355" loading="lazy"></p>
+<h5 id="【1-5】使用-或者-lt-gt-索引失效"><a href="#【1-5】使用-或者-lt-gt-索引失效" class="headerlink" title="【1.5】使用(!=或者&lt;&gt;)索引失效"></a>【1.5】使用(!=或者&lt;&gt;)索引失效</h5><pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># 在使用不等于(!=或者&lt;>)索引失效</span>
+<span class="token attr-name">explain</span> <span class="token attr-value">select * from employee where age != 10</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117164755120.png" alt="image-20210117164755120" loading="lazy"></p>
+<h5 id="【1-6】is-not-null无法使用索引"><a href="#【1-6】is-not-null无法使用索引" class="headerlink" title="【1.6】is not null无法使用索引"></a>【1.6】is not null无法使用索引</h5><pre class="language-mysql" data-language="mysql"><code class="language-mysql"># is not null无法使用索引
+explain select * from employee where dep_id is not NULL</code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201234508773.png" alt="image-20210201234508773" loading="lazy"></p>
+<h5 id="【1-7】like以通配符开头-qw-索引失效"><a href="#【1-7】like以通配符开头-qw-索引失效" class="headerlink" title="【1.7】like以通配符开头(%qw)索引失效"></a>【1.7】like以通配符开头(%qw)索引失效</h5><pre class="language-mysql" data-language="mysql"><code class="language-mysql"># like以通配符开头(%qw)索引失效
+explain select * from employee where name like &#39;%鲁&#39;</code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117170555988.png" alt="image-20210117170555988" loading="lazy"></p>
+<h5 id="【1-8】字符串不加引号索引失效"><a href="#【1-8】字符串不加引号索引失效" class="headerlink" title="【1.8】字符串不加引号索引失效"></a>【1.8】字符串不加引号索引失效</h5><pre class="language-mysql" data-language="mysql"><code class="language-mysql"># 字符串不加引号索引失效
+explain select * from employee where name &#x3D; 200</code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117170640459.png" alt="image-20210117170640459" loading="lazy"></p>
+<h5 id="【1-9】使用or连接索引失效"><a href="#【1-9】使用or连接索引失效" class="headerlink" title="【1.9】使用or连接索引失效"></a>【1.9】使用or连接索引失效</h5><pre class="language-mysql" data-language="mysql"><code class="language-mysql"># 使用or连接索引失效
+explain select * from employee where name &#x3D; &#39;鲁班&#39; or age&gt;10</code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117170709697.png" alt="image-20210117170709697" loading="lazy"></p>
+<h5 id="【1-10】尽量使用覆盖索引"><a href="#【1-10】尽量使用覆盖索引" class="headerlink" title="【1.10】尽量使用覆盖索引"></a>【1.10】尽量使用覆盖索引</h5><pre class="language-mysql" data-language="mysql"><code class="language-mysql">explain select * from employee where name &#x3D; &#39;鲁班&#39; or age&gt;10;
+-- 覆盖索引: 要查询的字段全部是索引字段
+-- 上面情况会触发全表扫描，不过若使用了覆盖索引，则会只扫描索引文件
+explain select name,dep_id,age from employee where name &#x3D; &#39;鲁班&#39; or age&gt;10</code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117170754854.png" alt="image-20210117170754854" loading="lazy"></p>
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210117170806482.png" alt="image-20210117170806482" loading="lazy"></p>
+<h4 id="【2】排序与分组优化"><a href="#【2】排序与分组优化" class="headerlink" title="【2】排序与分组优化"></a>【2】排序与分组优化</h4><p>创建user表如下</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">CREATE</span> <span class="token keyword">TABLE</span> tab_user<span class="token punctuation">(</span>
+  id <span class="token keyword">int</span> <span class="token keyword">primary</span> <span class="token keyword">key</span> <span class="token operator">not</span> <span class="token boolean">null</span> <span class="token keyword">auto_increment</span><span class="token punctuation">,</span>
+  age <span class="token keyword">INT</span><span class="token punctuation">,</span>
+  birth <span class="token keyword">TIMESTAMP</span> <span class="token operator">NOT</span> <span class="token boolean">NULL</span><span class="token punctuation">,</span>
+  name <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+	salary <span class="token keyword">decimal</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> tab_user<span class="token punctuation">(</span>age<span class="token punctuation">,</span>birth<span class="token punctuation">,</span>name<span class="token punctuation">,</span>salary<span class="token punctuation">)</span> <span class="token keyword">VALUES</span><span class="token punctuation">(</span><span class="token number">22</span><span class="token punctuation">,</span><span class="token function">NOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">'abc'</span><span class="token punctuation">,</span><span class="token number">10000.11</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> tab_user<span class="token punctuation">(</span>age<span class="token punctuation">,</span>birth<span class="token punctuation">,</span>name<span class="token punctuation">,</span>salary<span class="token punctuation">)</span> <span class="token keyword">VALUES</span><span class="token punctuation">(</span><span class="token number">23</span><span class="token punctuation">,</span><span class="token function">NOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">'bcd'</span><span class="token punctuation">,</span><span class="token number">5000.55</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">INSERT</span> <span class="token keyword">INTO</span> tab_user<span class="token punctuation">(</span>age<span class="token punctuation">,</span>birth<span class="token punctuation">,</span>name<span class="token punctuation">,</span>salary<span class="token punctuation">)</span> <span class="token keyword">VALUES</span><span class="token punctuation">(</span><span class="token number">24</span><span class="token punctuation">,</span><span class="token function">NOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token string">'def'</span><span class="token punctuation">,</span><span class="token number">60000.66</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+<span class="token keyword">CREATE</span> <span class="token keyword">INDEX</span> idx_age_birth_name <span class="token keyword">ON</span> tab_user<span class="token punctuation">(</span>age<span class="token punctuation">,</span>birth<span class="token punctuation">,</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+
+<h5 id="【2-1】无-Using-filesort的情况"><a href="#【2-1】无-Using-filesort的情况" class="headerlink" title="【2.1】无 Using filesort的情况"></a>【2.1】无 Using filesort的情况</h5><p><strong>满足最左匹配原则</strong></p>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token comment">-- 满足最左原则 不出现Using filesort</span>
+<span class="token keyword">explain</span> <span class="token keyword">select</span> age<span class="token punctuation">,</span> birth<span class="token punctuation">,</span>name <span class="token keyword">from</span> tab_user <span class="token keyword">where</span> age <span class="token operator">></span><span class="token number">10</span> <span class="token keyword">order</span> <span class="token keyword">by</span> age<span class="token punctuation">;</span>
+<span class="token keyword">explain</span> <span class="token keyword">select</span> age<span class="token punctuation">,</span> birth<span class="token punctuation">,</span>name <span class="token keyword">from</span> tab_user <span class="token keyword">where</span> age <span class="token operator">></span><span class="token number">10</span> <span class="token keyword">order</span> <span class="token keyword">by</span> age<span class="token punctuation">,</span>birth<span class="token punctuation">;</span>
+<span class="token keyword">explain</span> <span class="token keyword">select</span> age<span class="token punctuation">,</span> birth<span class="token punctuation">,</span>name <span class="token keyword">from</span> tab_user <span class="token keyword">where</span> age <span class="token operator">></span><span class="token number">10</span> <span class="token keyword">order</span> <span class="token keyword">by</span> age<span class="token punctuation">,</span>birth<span class="token punctuation">,</span>name<span class="token punctuation">;</span>
+<span class="token keyword">explain</span> <span class="token keyword">select</span> age<span class="token punctuation">,</span> birth<span class="token punctuation">,</span>name <span class="token keyword">from</span> tab_user <span class="token keyword">where</span> age <span class="token operator">></span><span class="token number">10</span> <span class="token keyword">order</span> <span class="token keyword">by</span> age <span class="token keyword">desc</span><span class="token punctuation">,</span>birth <span class="token keyword">desc</span><span class="token punctuation">,</span>name <span class="token keyword">desc</span><span class="token punctuation">;</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201232305310.png" alt="image-20210201232305310" loading="lazy"></p>
+<p><strong>where中索引的最左前缀定义为常量:</strong></p>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token comment">-- where中索引的最左前缀定义为常量:</span>
+<span class="token keyword">explain</span> <span class="token keyword">select</span> age<span class="token punctuation">,</span> birth<span class="token punctuation">,</span>name <span class="token keyword">from</span> tab_user <span class="token keyword">where</span> age <span class="token operator">=</span><span class="token number">10</span> <span class="token keyword">order</span> <span class="token keyword">by</span> age<span class="token punctuation">,</span> birth<span class="token punctuation">,</span>name<span class="token punctuation">;</span>
+<span class="token keyword">explain</span> <span class="token keyword">select</span> age<span class="token punctuation">,</span> birth<span class="token punctuation">,</span>name <span class="token keyword">from</span> tab_user <span class="token keyword">where</span> age <span class="token operator">=</span><span class="token number">10</span> <span class="token keyword">order</span> <span class="token keyword">by</span> birth<span class="token punctuation">,</span>name<span class="token punctuation">;</span>
+<span class="token keyword">explain</span> <span class="token keyword">select</span> age<span class="token punctuation">,</span> birth<span class="token punctuation">,</span>name <span class="token keyword">from</span> tab_user <span class="token keyword">where</span> age <span class="token operator">=</span><span class="token number">10</span> <span class="token operator">and</span> birth <span class="token operator">=</span> <span class="token string">'20200307'</span> <span class="token keyword">order</span> <span class="token keyword">by</span> name<span class="token punctuation">;</span>
+<span class="token keyword">explain</span> <span class="token keyword">select</span> age<span class="token punctuation">,</span> birth<span class="token punctuation">,</span>name <span class="token keyword">from</span> tab_user <span class="token keyword">where</span> age <span class="token operator">=</span><span class="token number">10</span> <span class="token operator">and</span> birth <span class="token operator">></span> <span class="token string">'20200307'</span> <span class="token keyword">order</span> <span class="token keyword">by</span>  birth<span class="token punctuation">,</span>name<span class="token punctuation">;</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201232556575.png" alt="image-20210201232556575" loading="lazy"></p>
+<h5 id="【2-2】有-Using-filesort的情况"><a href="#【2-2】有-Using-filesort的情况" class="headerlink" title="【2.2】有 Using filesort的情况"></a>【2.2】有 Using filesort的情况</h5><p><strong>覆盖索引情况下和非覆盖索引情况下稍微有点区别</strong></p>
+<p>以2.1中的sql为例，假如我将查询的内容改为 * ，我们再来看一下其执行计划</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token comment">-- **覆盖索引情况下和非覆盖索引情况下稍微有点区别**</span>
+<span class="token keyword">explain</span> <span class="token keyword">select</span><span class="token operator">*</span> <span class="token keyword">from</span> tab_user <span class="token keyword">where</span> age <span class="token operator">></span><span class="token number">10</span> <span class="token keyword">order</span> <span class="token keyword">by</span> age<span class="token punctuation">;</span>
+<span class="token keyword">explain</span> <span class="token keyword">select</span><span class="token operator">*</span> <span class="token keyword">from</span> tab_user <span class="token keyword">where</span> age <span class="token operator">></span><span class="token number">10</span> <span class="token keyword">order</span> <span class="token keyword">by</span> age<span class="token punctuation">,</span>birth<span class="token punctuation">;</span>
+<span class="token keyword">explain</span> <span class="token keyword">select</span><span class="token operator">*</span> <span class="token keyword">from</span> tab_user <span class="token keyword">where</span> age <span class="token operator">></span><span class="token number">10</span> <span class="token keyword">order</span> <span class="token keyword">by</span> age<span class="token punctuation">,</span>birth<span class="token punctuation">,</span>name<span class="token punctuation">;</span>
+<span class="token keyword">explain</span> <span class="token keyword">select</span><span class="token operator">*</span> <span class="token keyword">from</span> tab_user <span class="token keyword">where</span> age <span class="token operator">></span><span class="token number">10</span> <span class="token keyword">order</span> <span class="token keyword">by</span> age <span class="token keyword">desc</span><span class="token punctuation">,</span>birth <span class="token keyword">desc</span><span class="token punctuation">,</span>name <span class="token keyword">desc</span><span class="token punctuation">;</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201233016445.png" alt="image-20210201233016445" loading="lazy"></p>
+<p><strong>where查询出的数据进行再次内部排序</strong></p>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token comment">-- 使用内部排序</span>
+<span class="token comment">-- 排序不一致的情况</span>
+<span class="token keyword">explain</span> <span class="token keyword">select</span> age<span class="token punctuation">,</span> birth<span class="token punctuation">,</span>name <span class="token keyword">from</span> tab_user <span class="token keyword">where</span> age <span class="token operator">></span><span class="token number">10</span>  <span class="token keyword">order</span> <span class="token keyword">by</span> age <span class="token keyword">asc</span><span class="token punctuation">,</span>  birth <span class="token keyword">desc</span><span class="token punctuation">,</span> name <span class="token keyword">desc</span><span class="token punctuation">;</span>
+<span class="token comment">-- 丢失age索引</span>
+<span class="token keyword">explain</span> <span class="token keyword">select</span> age<span class="token punctuation">,</span> birth<span class="token punctuation">,</span>name <span class="token keyword">from</span> tab_user <span class="token keyword">where</span> age <span class="token operator">></span><span class="token number">10</span>  <span class="token keyword">order</span> <span class="token keyword">by</span> birth<span class="token punctuation">,</span> name <span class="token punctuation">;</span>
+<span class="token comment">-- salary不是索引</span>
+<span class="token keyword">explain</span> <span class="token keyword">select</span> age<span class="token punctuation">,</span> birth<span class="token punctuation">,</span>name <span class="token keyword">from</span> tab_user <span class="token keyword">where</span> age <span class="token operator">=</span><span class="token number">10</span> <span class="token keyword">order</span> <span class="token keyword">by</span> age<span class="token punctuation">,</span> salary<span class="token punctuation">;</span>
+<span class="token comment">-- 这种情况也属于丢失a索引，并且in里面如果只有一个值时mysql会优化为常量，如果为多个值时，哪怕这些值全一样，也会出现 Using filesort</span>
+<span class="token keyword">explain</span> <span class="token keyword">select</span> age<span class="token punctuation">,</span> birth<span class="token punctuation">,</span>name <span class="token keyword">from</span> tab_user <span class="token keyword">where</span> age <span class="token operator">in</span> <span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token number">20</span><span class="token punctuation">,</span><span class="token number">30</span><span class="token punctuation">)</span> <span class="token keyword">order</span> <span class="token keyword">by</span> birth<span class="token punctuation">,</span> name<span class="token punctuation">;</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210201235242682.png" alt="image-20210201235242682" loading="lazy"></p>
+<h4 id="【3】大数据量分页优化"><a href="#【3】大数据量分页优化" class="headerlink" title="【3】大数据量分页优化"></a>【3】大数据量分页优化</h4><p>– 分页是我们经常使用的功能，在数据量少时单纯的使用limit m,n 不会感觉到性能的影响<br>– 但我们的数据达到成百上千万时 ， 就会明显查询速度越来越低</p>
+<p>导入数据脚本</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token comment">-- 使用存储过程导入数据</span>
+<span class="token comment">-- 查看是否开启函数功能</span>
+<span class="token keyword">show</span> variables <span class="token operator">like</span> <span class="token string">'log_bin_trust_function_creators'</span><span class="token punctuation">;</span>
+<span class="token comment">-- 设置开启函数功能</span>
+<span class="token keyword">set</span> <span class="token keyword">global</span> log_bin_trust_function_creators<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token comment">-- 创建函数用于生成随机字符串</span>
+<span class="token keyword">delimiter</span> $$
+ <span class="token keyword">create</span> <span class="token keyword">function</span> rand_string<span class="token punctuation">(</span>n <span class="token keyword">int</span><span class="token punctuation">)</span> <span class="token keyword">returns</span> <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">)</span>
+ <span class="token keyword">begin</span>
+   <span class="token keyword">declare</span> chars_str <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span> <span class="token keyword">default</span> <span class="token string">'qwertyuiopasdfghjklzxcvbnm'</span><span class="token punctuation">;</span>
+   <span class="token keyword">declare</span> return_str <span class="token keyword">varchar</span><span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">)</span> <span class="token keyword">default</span> <span class="token string">''</span><span class="token punctuation">;</span>
+   <span class="token keyword">declare</span> i <span class="token keyword">int</span> <span class="token keyword">default</span> <span class="token number">0</span><span class="token punctuation">;</span>
+   <span class="token keyword">while</span> i<span class="token operator">&lt;</span>n <span class="token keyword">do</span>
+   <span class="token keyword">set</span> return_str<span class="token operator">=</span>concat<span class="token punctuation">(</span>return_str<span class="token punctuation">,</span>substring<span class="token punctuation">(</span>chars_str<span class="token punctuation">,</span>floor<span class="token punctuation">(</span><span class="token number">1</span><span class="token operator">+</span>rand<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">52</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token keyword">set</span> i<span class="token operator">=</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">;</span>
+   <span class="token keyword">end</span> <span class="token keyword">while</span><span class="token punctuation">;</span>
+   <span class="token keyword">return</span> return_str<span class="token punctuation">;</span>
+ <span class="token keyword">end</span> $$
+<span class="token comment">-- 创建存储过程用于插入数据</span>
+<span class="token keyword">delimiter</span> $$
+<span class="token keyword">create</span> <span class="token keyword">procedure</span> insert_emp<span class="token punctuation">(</span><span class="token operator">in</span> <span class="token keyword">start</span> <span class="token keyword">int</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token operator">in</span> max_num <span class="token keyword">int</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">begin</span>
+ <span class="token keyword">declare</span> i <span class="token keyword">int</span> <span class="token keyword">default</span> <span class="token number">0</span><span class="token punctuation">;</span>
+ <span class="token comment">/*把autocommit设置成0*/</span>
+ <span class="token keyword">set</span> autocommit<span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+ <span class="token keyword">repeat</span>
+ <span class="token keyword">set</span> i<span class="token operator">=</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">;</span>
+ <span class="token keyword">insert</span> <span class="token keyword">into</span> testemployee<span class="token punctuation">(</span>name<span class="token punctuation">,</span>dep_id<span class="token punctuation">,</span>age<span class="token punctuation">,</span>salary<span class="token punctuation">,</span>cus_id<span class="token punctuation">)</span>
+ <span class="token keyword">values</span><span class="token punctuation">(</span>rand_string<span class="token punctuation">(</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">,</span>ceil<span class="token punctuation">(</span>rand<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">18</span><span class="token operator">+</span>ceil<span class="token punctuation">(</span>rand<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token number">3000</span><span class="token operator">+</span>ceil<span class="token punctuation">(</span>rand<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">10000</span><span class="token punctuation">)</span><span class="token punctuation">,</span>ceil<span class="token punctuation">(</span>rand<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+ until i<span class="token operator">=</span>max_num <span class="token keyword">end</span> <span class="token keyword">repeat</span><span class="token punctuation">;</span>
+<span class="token keyword">commit</span><span class="token punctuation">;</span>
+<span class="token keyword">end</span> $$
+
+<span class="token comment">-- 调用存储过程插入数据</span>
+<span class="token keyword">call</span> insert_emp<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1000000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+
+<p>测试一下</p>
+<pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># 测试一下分页数据的相应时间</span>
+<span class="token comment"># limit 0,20 时间: 0.001ms</span>
+<span class="token attr-name">select</span> <span class="token attr-value">* from testemployee limit 0,20</span>
+<span class="token comment"># limit 1000,20 时间: 0.004ms</span>
+<span class="token attr-name">select</span> <span class="token attr-value">* from testemployee limit 1000,20</span>
+<span class="token comment"># limit 10000,20 时间: 0.044ms</span>
+<span class="token attr-name">select</span> <span class="token attr-value">* from testemployee limit 10000,20</span>
+<span class="token comment"># limit 100000,20 时间:  0.370ms</span>
+<span class="token attr-name">select</span> <span class="token attr-value">* from testemployee limit 100000,20</span>
+<span class="token comment"># limit 300000,20 时间: 1.068ms</span>
+<span class="token attr-name">select</span> <span class="token attr-value">* from testemployee limit 300000,20</span></code></pre>
+
+<h5 id="【3-1】使用子查询优化"><a href="#【3-1】使用子查询优化" class="headerlink" title="【3.1】使用子查询优化"></a>【3.1】使用子查询优化</h5><pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token attr-name">--</span> <span class="token attr-value">子查询优化</span>
+<span class="token attr-name">--</span> <span class="token attr-value">通过Explain发现，之前我们没有利用到索引，这次我们利用索引查询出对应的所有ID</span>
+<span class="token attr-name">--</span> <span class="token attr-value">在通过关联查询，查询出对应的全部数据，性能有了明显提升</span>
+<span class="token attr-name">--</span> <span class="token attr-value">limit 2900000,20 时间: 1.068ms -> 时间: 0.742ms</span>
+<span class="token attr-name">select</span> <span class="token attr-value">* from testemployee e,(select id from testemployee limit 2900000,20) tmp where e.id=tmp.id;</span>
+<span class="token attr-name">--</span> <span class="token attr-value">自增ID也可以用如下方式</span>
+<span class="token attr-name">select</span> <span class="token attr-value">* from testemployee where id> (select id from testemployee t limit 2900000,1) LIMIT 10</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210202000238990.png" alt="image-20210202000238990" loading="lazy"></p>
+<h5 id="【3-2】使用id限定方案"><a href="#【3-2】使用id限定方案" class="headerlink" title="【3.2】使用id限定方案"></a>【3.2】使用id限定方案</h5><pre class="language-properties" data-language="properties"><code class="language-properties"><span class="token comment"># 使用id限定方案，将上一页的ID传递过来 根据id范围进行分页查询</span>
+<span class="token comment"># 通过程序的设计，持续保留上一页的ID，并且ID保证自增</span>
+<span class="token comment"># 时间: 0.010ms   </span>
+<span class="token attr-name">select</span> <span class="token attr-value">* from testemployee where id>300109 limit 20</span>
+<span class="token comment"># 虽然使用条件有些苛刻 但效率非常高，可以和方案一组合使用 ，跳转某页使用方案一 下一页使用方案2</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210202000255372.png" alt="image-20210202000255372" loading="lazy"></p>
+<h4 id="【4】小表驱动大表"><a href="#【4】小表驱动大表" class="headerlink" title="【4】小表驱动大表"></a>【4】小表驱动大表</h4><h5 id="【4-1】表关联查询"><a href="#【4-1】表关联查询" class="headerlink" title="【4.1】表关联查询"></a>【4.1】表关联查询</h5><pre class="language-mysql" data-language="mysql"><code class="language-mysql">explain select e.id from employee e,department d where e.dep_id&#x3D;d.id 
+MySQL 表关联的算法是 Nest Loop Join，是通过驱动表的结果集作为循环基础数据，
+然后一条一条地通过该结果集中的数据作为过滤条件到下一个表中查询数据，然后合并结果。
+如果小的循环在外层，对于数据库连接来说就只连接5次，进行5000次操作，
+如果1000在外，则需要进行1000次数据库连接，从而浪费资源，增加消耗。
+这就是为什么要小表驱动大表。</code></pre>
+
+<pre class="language-mysql" data-language="mysql"><code class="language-mysql">总结：
+多表查询中，一定要让小表驱动大表
+create index idx_dep_id on testemployee(dep_id)
+
+explain select e.id from testemployee e LEFT JOIN department d on e.dep_id&#x3D;d.id
+
+explain select e.id from testemployee e RIGHT JOIN department d on e.dep_id&#x3D;d.id
+</code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210202000743113.png" alt="image-20210202000743113" loading="lazy"></p>
+<h5 id="【4-2】in和exits查询"><a href="#【4-2】in和exits查询" class="headerlink" title="【4.2】in和exits查询"></a>【4.2】in和exits查询</h5><p>使用in 时的explain执行计划 d的数据先被查询出来, 根据d的结果集循环查询e表数据</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">EXPLAIN</span> <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> employee e <span class="token keyword">where</span> e<span class="token punctuation">.</span>dep_id <span class="token operator">in</span> <span class="token punctuation">(</span><span class="token keyword">select</span> id <span class="token keyword">from</span> department d<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/image-20210202001121669.png" alt="image-20210202001121669" loading="lazy"></p>
+<p>使用exits时的explain执行计划   虽然d的查询优先级高，但是当select_type为DEPENDENT_SUBQUERY时，代表当前子查询依赖外部查询，所以可以考虑到 e表先进行查询</p>
+<pre class="language-sql" data-language="sql"><code class="language-sql"><span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> employee e <span class="token keyword">where</span> <span class="token keyword">exists</span> <span class="token punctuation">(</span><span class="token keyword">select</span> <span class="token number">1</span> <span class="token keyword">from</span> department d <span class="token keyword">where</span> d<span class="token punctuation">.</span>id <span class="token operator">=</span> e<span class="token punctuation">.</span>dep_id<span class="token punctuation">)</span></code></pre>
+
+<p><img src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/MySQL-%E4%BD%93%E7%B3%BB/1598535511423.png" alt="1598535511423" loading="lazy"></p>
+<pre class="language-none"><code class="language-none">总结：
+	当e表数据多于d表中的数据时，这是我们使用in优于Exists
+	当d表数据多于e表中的数据时,这时我们使用Exists优于in
+	如果数据量差不多，那么它们的执行性能差不多
+	Exists子查询只返回true或false,因此子查询中的select * 可以是select 1或其它</code></pre>
+
+<h4 id="【5】max函数优化"><a href="#【5】max函数优化" class="headerlink" title="【5】max函数优化"></a>【5】max函数优化</h4><pre class="language-mysql" data-language="mysql"><code class="language-mysql">-- 给max函数中的字段添加索引
+select max(age) from testemployee</code></pre>
+
+</div><div id="reward-container"><span class="hty-icon-button button-glow" id="reward-button" title="打赏" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === &quot;none&quot;) ? &quot;block&quot; : &quot;none&quot;;"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-hand-coin-line"></use></svg></span><div id="reward-comment">我很可爱，请给我钱</div><div id="qr" style="display:none;"><div style="display:inline-block"><a target="_blank" rel="noopener" href="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/medias/reward/alipay.jpg"><img loading="lazy" src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/medias/reward/alipay.jpg" alt="支付宝" title="支付宝"></a><div><span style="color:#00A3EE"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-alipay-line"></use></svg></span></div></div><div style="display:inline-block"><a target="_blank" rel="noopener" href="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/medias/reward/wechat.png"><img loading="lazy" src="https://bk-zhuq.oss-cn-shanghai.aliyuncs.com/medias/reward/wechat.png" alt="微信支付" title="微信支付"></a><div><span style="color:#2DC100"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-wechat-pay-line"></use></svg></span></div></div></div></div><ul class="post-copyright"><li class="post-copyright-author"><strong>本文作者：</strong>xinzhu</li><li class="post-copyright-link"><strong>本文链接：</strong><a href="https://xinzhu37.github.io/note/Interview/MySQL-%E4%BD%93%E7%B3%BB/" title="MySQL体系">https://xinzhu37.github.io/note/Interview/MySQL-%E4%BD%93%E7%B3%BB/</a></li><li class="post-copyright-license"><strong>版权声明：</strong>本博客所有文章除特别声明外，均默认采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener" title="CC BY-NC-SA 4.0 "><svg class="icon"><use xlink:href="#icon-creative-commons-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-by-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-nc-line"></use></svg><svg class="icon"><use xlink:href="#icon-creative-commons-sa-line"></use></svg></a> 许可协议。</li></ul></section></article><div class="post-nav"><div class="post-nav-item"><a class="post-nav-prev" href="/note/skill/Spring%20Data%20JPA%E5%AD%A6%E4%B9%A0/" rel="prev" title="Spring Data JPA学习"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-arrow-left-s-line"></use></svg><span class="post-nav-text">Spring Data JPA学习</span></a></div><div class="post-nav-item"><a class="post-nav-next" href="/note/Interview/MySQL-%E7%B4%A2%E5%BC%95%E5%8A%A0%E5%BC%BA/" rel="next" title="索引加强"><span class="post-nav-text">索引加强</span><svg class="icon" aria-hidden="true"><use xlink:href="#icon-arrow-right-s-line"></use></svg></a></div></div></div><div class="hty-card" id="comment"><div class="comment-tooltip text-center"><span>如果您有任何关于博客内容的相关讨论，欢迎前往 <a href="https://github.com/xinzhu37/xinzhu37.github.io/issues" target="_blank">GitHub issues</a> 与我交流。</span><br></div></div></main><footer class="sidebar-translate" id="footer"><div class="copyright"><span>&copy; 2020 – 2022 </span><span class="with-love" id="animate"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-cloud-line"></use></svg></span><span class="author"> xinzhu</span></div><div class="powered"><span>由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动 v5.4.0</span><span class="footer-separator">|</span><span>主题 - <a rel="noopener" href="https://github.com/YunYouJun/hexo-theme-yun" target="_blank"><span>Yun</span></a> v1.6.1</span></div><div class="live_time"><span>本博客已运行</span><span id="display_live_time"></span><span class="moe-text">(●'◡'●)</span><script>function blog_live_time() {
+  setTimeout(blog_live_time, 1000);
+  const start = new Date('2020-09-30T00:00:00');
+  const now = new Date();
+  const timeDiff = (now.getTime() - start.getTime());
+  const msPerMinute = 60 * 1000;
+  const msPerHour = 60 * msPerMinute;
+  const msPerDay = 24 * msPerHour;
+  const passDay = Math.floor(timeDiff / msPerDay);
+  const passHour = Math.floor((timeDiff % msPerDay) / 60 / 60 / 1000);
+  const passMinute = Math.floor((timeDiff % msPerHour) / 60 / 1000);
+  const passSecond = Math.floor((timeDiff % msPerMinute) / 1000);
+  display_live_time.innerHTML = " " + passDay + " 天 " + passHour + " 小时 " + passMinute + " 分 " + passSecond + " 秒";
+}
+blog_live_time();
+</script></div></footer><a class="hty-icon-button" id="back-to-top" aria-label="back-to-top" href="#"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-arrow-up-s-line"></use></svg><svg class="progress-circle-container" viewBox="0 0 100 100"><circle class="progress-circle" id="progressCircle" cx="50" cy="50" r="48" fill="none" stroke="#0078E7" stroke-width="2" stroke-linecap="round"></circle></svg></a></div></body></html>
